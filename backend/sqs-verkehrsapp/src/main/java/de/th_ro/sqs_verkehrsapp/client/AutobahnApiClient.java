@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.client;
 
 import de.th_ro.sqs_verkehrsapp.config.AutobahnApiProperties;
+import de.th_ro.sqs_verkehrsapp.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.dto.wrapper.WarningResponse;
 import org.springframework.stereotype.Component;
@@ -37,11 +38,11 @@ public class AutobahnApiClient {
                 .block();
     }
 
-    public String getClosures(String roadId) {
+    public ClosureResponse getClosures(String roadId) {
         return webClient.get()
                 .uri("/{roadId}/services/closure", roadId)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(ClosureResponse.class)
                 .block();
     }
 

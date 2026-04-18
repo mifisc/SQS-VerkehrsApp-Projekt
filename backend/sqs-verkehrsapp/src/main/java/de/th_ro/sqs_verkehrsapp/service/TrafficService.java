@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.service;
 
 import de.th_ro.sqs_verkehrsapp.client.AutobahnApiClient;
+import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
 import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class TrafficService {
         return autobahnApiClient.getWarnings(roadId).getWarning();
     }
 
-    public String loadClosures(String roadId) {
-        return autobahnApiClient.getClosures(roadId);
+    public List<ClosureDto> loadClosures(String roadId) {
+        return autobahnApiClient.getClosures(roadId).getClosures();
     }
 
     public String loadChargingStations(String roadId) {

@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
+import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
 import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
 import de.th_ro.sqs_verkehrsapp.service.TrafficService;
@@ -32,7 +33,7 @@ public class TrafficController {
     }
 
     @GetMapping("/{roadId}/closures")
-    public ResponseEntity<String> getClosures(@PathVariable String roadId) {
+    public ResponseEntity<List<ClosureDto>> getClosures(@PathVariable String roadId) {
         return ResponseEntity.ok(trafficService.loadClosures(roadId));
     }
 
