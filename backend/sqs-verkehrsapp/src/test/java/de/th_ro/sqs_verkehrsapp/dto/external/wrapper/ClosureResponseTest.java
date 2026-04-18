@@ -1,23 +1,23 @@
-package de.th_ro.sqs_verkehrsapp.dto.wrapper;
+package de.th_ro.sqs_verkehrsapp.dto.external.wrapper;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class WarningResponseTest {
+class ClosureResponseTest {
 
     @Autowired
-    private JacksonTester<WarningResponse> json;
+    private JacksonTester<ClosureResponse> json;
 
     @Test
-    void shouldDeserializeWarningResponse() throws Exception {
+    void shouldDeserializeClosureResponse() throws Exception {
         String content = """
             {
-              "warning": [
+              "closure": [
                 {
                   "identifier": "id-1",
                   "title": "A1 | Test",
@@ -31,11 +31,11 @@ class WarningResponseTest {
             }
             """;
 
-        WarningResponse response = json.parseObject(content);
+        ClosureResponse response = json.parseObject(content);
 
-        assertThat(response.getWarnings()).hasSize(1);
-        assertThat(response.getWarnings().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
-        assertThat(response.getWarnings().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
+        assertThat(response.getClosures()).hasSize(1);
+        assertThat(response.getClosures().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
+        assertThat(response.getClosures().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
     }
 
 }

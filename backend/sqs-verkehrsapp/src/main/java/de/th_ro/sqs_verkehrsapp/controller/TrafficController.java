@@ -1,9 +1,9 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
-import de.th_ro.sqs_verkehrsapp.dto.ChargingStationDto;
-import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
-import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
-import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ChargingStationDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ClosureDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.RoadworkDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.WarningDto;
 import de.th_ro.sqs_verkehrsapp.service.TrafficService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

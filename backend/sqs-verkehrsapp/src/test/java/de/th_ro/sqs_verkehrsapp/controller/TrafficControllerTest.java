@@ -1,6 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
-import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ClosureDto;
 import de.th_ro.sqs_verkehrsapp.service.TrafficService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

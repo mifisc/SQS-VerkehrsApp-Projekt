@@ -1,10 +1,10 @@
 package de.th_ro.sqs_verkehrsapp.service;
 
 import de.th_ro.sqs_verkehrsapp.client.AutobahnApiClient;
-import de.th_ro.sqs_verkehrsapp.dto.ChargingStationDto;
-import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
-import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
-import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ChargingStationDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ClosureDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.RoadworkDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.WarningDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

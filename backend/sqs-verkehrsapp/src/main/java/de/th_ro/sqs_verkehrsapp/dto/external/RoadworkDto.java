@@ -1,12 +1,14 @@
-package de.th_ro.sqs_verkehrsapp.dto;
+package de.th_ro.sqs_verkehrsapp.dto.external;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RoadworkDto {
 
     private String identifier;

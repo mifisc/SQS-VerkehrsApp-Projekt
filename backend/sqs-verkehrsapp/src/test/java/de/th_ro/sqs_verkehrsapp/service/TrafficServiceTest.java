@@ -1,14 +1,14 @@
 package de.th_ro.sqs_verkehrsapp.service;
 
 import de.th_ro.sqs_verkehrsapp.client.AutobahnApiClient;
-import de.th_ro.sqs_verkehrsapp.dto.ChargingStationDto;
-import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
-import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
-import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.ChargingStationResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.ChargingStationDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.ClosureDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.RoadworkDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.WarningDto;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.ChargingStationResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.WarningResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,10 +1,10 @@
 package de.th_ro.sqs_verkehrsapp.client;
 
 import de.th_ro.sqs_verkehrsapp.config.AutobahnApiProperties;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.ChargingStationResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.ChargingStationResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.dto.external.wrapper.WarningResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 

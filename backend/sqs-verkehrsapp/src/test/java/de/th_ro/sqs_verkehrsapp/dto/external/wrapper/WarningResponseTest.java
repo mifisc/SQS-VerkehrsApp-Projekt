@@ -1,6 +1,5 @@
-package de.th_ro.sqs_verkehrsapp.dto.wrapper;
+package de.th_ro.sqs_verkehrsapp.dto.external.wrapper;
 
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -9,19 +8,20 @@ import org.springframework.boot.test.json.JacksonTester;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @JsonTest
-class RoadworksResponseTest {
+class WarningResponseTest {
 
     @Autowired
-    private JacksonTester<RoadworksResponse> json;
+    private JacksonTester<WarningResponse> json;
 
     @Test
-    void shouldDeserializeRoadworksResponse() throws Exception {
+    void shouldDeserializeWarningResponse() throws Exception {
         String content = """
             {
-              "roadworks": [
+              "warning": [
                 {
                   "identifier": "id-1",
                   "title": "A1 | Test",
+                  "display_type": "WEIGHT_LIMIT_35",
                   "coordinate": {
                     "lat": "51.036440",
                     "long": "6.964910"
@@ -31,11 +31,11 @@ class RoadworksResponseTest {
             }
             """;
 
-        RoadworksResponse response = json.parseObject(content);
+        WarningResponse response = json.parseObject(content);
 
-        assertThat(response.getRoadworks()).hasSize(1);
-        AssertionsForClassTypes.assertThat(response.getRoadworks().get(0).getIdentifier()).isEqualTo("id-1");
-        AssertionsForClassTypes.assertThat(response.getRoadworks().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
+        assertThat(response.getWarnings()).hasSize(1);
+        assertThat(response.getWarnings().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
+        assertThat(response.getWarnings().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
     }
 
 }

@@ -1,14 +1,16 @@
-package de.th_ro.sqs_verkehrsapp.dto;
+package de.th_ro.sqs_verkehrsapp.dto.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
-public class WarningDto {
+@NoArgsConstructor
+public class ChargingStationDto {
 
     private String extent;
     private String identifier;
@@ -34,5 +36,4 @@ public class WarningDto {
 
     private boolean future;
     private String subtitle;
-    private String startTimestamp;
 }
