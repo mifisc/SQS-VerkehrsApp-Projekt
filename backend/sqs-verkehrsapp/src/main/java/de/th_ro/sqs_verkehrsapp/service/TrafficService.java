@@ -27,7 +27,7 @@ public class TrafficService {
     }
 
     public List<ClosureDto> loadClosures(String roadId) {
-        return autobahnApiClient.getClosures(roadId).getClosures();
+        return autobahnApiClient.getClosures(roadId).getClosure();
     }
 
     public List<ChargingStationDto> loadChargingStations(String roadId) {

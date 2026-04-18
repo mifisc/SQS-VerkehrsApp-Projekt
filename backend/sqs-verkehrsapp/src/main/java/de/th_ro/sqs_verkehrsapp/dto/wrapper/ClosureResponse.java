@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 public class ClosureResponse {
 
-    private List<ClosureDto> closures;
+    private List<ClosureDto> closure;
 }
