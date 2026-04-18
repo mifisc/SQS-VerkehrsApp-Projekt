@@ -21,6 +21,8 @@ public class DemoDataInitializer {
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
+            purgeTestUsers(userRepository, routeWatchRepository);
+
             if (userRepository.existsByUsername("demo_driver")) {
                 return;
             }
@@ -43,6 +45,17 @@ public class DemoDataInitializer {
                 routeWatchRepository.save(routeWatch);
             }
         };
+    }
+
+    private void purgeTestUsers(AppUserRepository userRepository, RouteWatchRepository routeWatchRepository) {
+        List<AppUser> testUsers = userRepository.findAll().stream()
+                .filter(user -> user.getUsername() != null && user.getUsername().startsWith("testuser"))
+                .toList();
+
+        for (AppUser user : testUsers) {
+            routeWatchRepository.deleteAll(routeWatchRepository.findAllByUserOrderByCreatedAtAsc(user));
+            userRepository.delete(user);
+        }
     }
 
     private List<RouteSeed> demoRoutes() {

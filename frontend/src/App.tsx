@@ -16,6 +16,12 @@ import type { AuthResponse, DashboardResponse, Incident, IncidentResponse } from
 import "./styles.css";
 
 const SESSION_STORAGE_KEY = "autobahn-safety-monitor-session";
+const MAX_SELECTED_ROADS = 15;
+
+type Toast = {
+  id: number;
+  message: string;
+};
 
 function compareRoads(left: string, right: string): number {
   const pattern = /^A(\d+)([A-Z]*)$/i;
@@ -34,6 +40,15 @@ function compareRoads(left: string, right: string): number {
   return leftMatch[2].localeCompare(rightMatch[2], "de");
 }
 
+function pickRandomRoads(roads: string[], count: number): string[] {
+  const shuffled = [...roads];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled.slice(0, Math.min(count, roads.length)).sort(compareRoads);
+}
+
 function formatTimestamp(value: string | null | undefined): string {
   if (!value) {
     return "Zeitpunkt unbekannt";
@@ -50,35 +65,6 @@ function formatTimestamp(value: string | null | undefined): string {
   }).format(date);
 }
 
-function riskLabel(score: number): string {
-  if (score >= 75) {
-    return "hoch";
-  }
-  if (score >= 45) {
-    return "mittel";
-  }
-  if (score > 0) {
-    return "niedrig";
-  }
-  return "keine Auffaelligkeit";
-}
-
-function buildRoadSummary(selectedRoads: string[], allRoads: string[], allSelected: boolean): string {
-  if (allRoads.length === 0) {
-    return "Autobahnen werden geladen";
-  }
-  if (allSelected) {
-    return `Alle ${allRoads.length} Autobahnen ausgewaehlt`;
-  }
-  if (selectedRoads.length === 0) {
-    return "Keine Autobahn ausgewaehlt";
-  }
-  if (selectedRoads.length <= 3) {
-    return selectedRoads.join(", ");
-  }
-  return `${selectedRoads.length} von ${allRoads.length} Autobahnen ausgewaehlt`;
-}
-
 function groupIncidentsByRoad(incidents: Incident[]): Array<{ roadId: string; incidents: Incident[] }> {
   const groups = new Map<string, Incident[]>();
 
@@ -93,12 +79,6 @@ function groupIncidentsByRoad(incidents: Incident[]): Array<{ roadId: string; in
     .map(([roadId, roadIncidents]) => ({ roadId, incidents: roadIncidents }));
 }
 
-function toggleRoad(selectedRoads: string[], road: string): string[] {
-  return selectedRoads.includes(road)
-    ? selectedRoads.filter((selected) => selected !== road)
-    : [...selectedRoads, road].sort(compareRoads);
-}
-
 function filterRoads(roads: string[], query: string): string[] {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) {
@@ -107,81 +87,20 @@ function filterRoads(roads: string[], query: string): string[] {
   return roads.filter((road) => road.toLowerCase().includes(normalizedQuery));
 }
 
-function RoadPicker({
-  title,
-  description,
-  roads,
-  selectedRoads,
-  allSelected,
-  isOpen,
-  searchValue,
-  onToggleOpen,
-  onToggleAll,
-  onToggleRoad,
-  onSearchChange
-}: {
-  title: string;
-  description: string;
-  roads: string[];
-  selectedRoads: string[];
-  allSelected: boolean;
-  isOpen: boolean;
-  searchValue: string;
-  onToggleOpen: () => void;
-  onToggleAll: () => void;
-  onToggleRoad: (road: string) => void;
-  onSearchChange: (value: string) => void;
-}) {
-  const filteredRoads = filterRoads(roads, searchValue);
-  const summary = buildRoadSummary(selectedRoads, roads, allSelected);
-
-  return (
-    <section className={`road-picker${isOpen ? " road-picker--open" : ""}`}>
-      <button type="button" className="road-picker__toggle" onClick={onToggleOpen}>
-        <div>
-          <span className="road-picker__label">{title}</span>
-          <strong>{summary}</strong>
-          <p>{description}</p>
-        </div>
-        <span className="road-picker__icon" aria-hidden="true">
-          {isOpen ? "−" : "+"}
-        </span>
-      </button>
-      {isOpen ? (
-        <div className="road-picker__panel">
-          <div className="road-picker__toolbar">
-            <label>
-              Suche
-              <input
-                type="text"
-                value={searchValue}
-                onChange={(event) => onSearchChange(event.target.value)}
-                placeholder="z. B. A3"
-              />
-            </label>
-            <button type="button" className={`road-option road-option--all${allSelected ? " road-option--active" : ""}`} onClick={onToggleAll}>
-              <span>Alle</span>
-            </button>
-          </div>
-          <div className="road-selector">
-            {filteredRoads.map((road) => {
-              const checked = allSelected || selectedRoads.includes(road);
-              return (
-                <label key={road} className={`road-option${checked ? " road-option--active" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => onToggleRoad(road)}
-                  />
-                  <span>{road}</span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </section>
-  );
+function selectionSummary(selectedRoads: string[], allRoads: string[]): string {
+  if (allRoads.length === 0) {
+    return "Autobahnen werden geladen";
+  }
+  if (selectedRoads.length === 0) {
+    return "Keine Autobahn ausgewählt";
+  }
+  if (selectedRoads.length === MAX_SELECTED_ROADS) {
+    return `${MAX_SELECTED_ROADS} ausgewählt (Maximum)`;
+  }
+  if (selectedRoads.length <= 3) {
+    return selectedRoads.join(", ");
+  }
+  return `${selectedRoads.length} ausgewählt`;
 }
 
 function IncidentCard({ incident }: { incident: Incident }) {
@@ -210,33 +129,46 @@ export default function App() {
   const [session, setSession] = useState<AuthResponse | null>(null);
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [availableRoads, setAvailableRoads] = useState<string[]>([]);
+  const [selectedRoads, setSelectedRoads] = useState<string[]>([]);
+  const [roadSearch, setRoadSearch] = useState("");
+  const [roadPickerOpen, setRoadPickerOpen] = useState(false);
   const [incidentResponse, setIncidentResponse] = useState<IncidentResponse | null>(null);
   const [loadingIncidents, setLoadingIncidents] = useState(false);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
   const [submittingRoute, setSubmittingRoute] = useState(false);
   const [submittingAuth, setSubmittingAuth] = useState(false);
-  const [pageError, setPageError] = useState<string | null>(null);
-
-  const [publicRoads, setPublicRoads] = useState<string[]>([]);
-  const [allPublicRoadsSelected, setAllPublicRoadsSelected] = useState(false);
-  const [routeRoads, setRouteRoads] = useState<string[]>([]);
-  const [allRouteRoadsSelected, setAllRouteRoadsSelected] = useState(false);
-  const [publicRoadPickerOpen, setPublicRoadPickerOpen] = useState(false);
-  const [routeRoadPickerOpen, setRouteRoadPickerOpen] = useState(false);
-  const [publicRoadSearch, setPublicRoadSearch] = useState("");
-  const [routeRoadSearch, setRouteRoadSearch] = useState("");
-  const [roadsInitialized, setRoadsInitialized] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toastCounter, setToastCounter] = useState(0);
 
   const [routeName, setRouteName] = useState("");
   const [routeNotes, setRouteNotes] = useState("");
 
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
-  const [loginUsername, setLoginUsername] = useState("demo_driver");
-  const [loginPassword, setLoginPassword] = useState("Demo123!");
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerDisplayName, setRegisterDisplayName] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+
+  function showToast(message: string) {
+    const id = toastCounter + 1;
+    setToastCounter(id);
+    setToasts((current) => [...current, { id, message }]);
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+    }, 4800);
+  }
+
+  function openAuthDialog() {
+    setAuthMode("login");
+    setLoginUsername("");
+    setLoginPassword("");
+    setRegisterUsername("");
+    setRegisterDisplayName("");
+    setRegisterPassword("");
+    setAuthDialogOpen(true);
+  }
 
   useEffect(() => {
     const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
@@ -254,15 +186,11 @@ export default function App() {
       try {
         const routes = (await fetchAvailableRoutes()).sort(compareRoads);
         setAvailableRoads(routes);
-
-        if (!roadsInitialized) {
-          setPublicRoads(routes);
-          setAllPublicRoadsSelected(true);
-          setRoadsInitialized(true);
-          await loadIncidents(routes, true);
-        }
+        const initialRoads = pickRandomRoads(routes, 2);
+        setSelectedRoads(initialRoads);
+        await loadIncidents(initialRoads);
       } catch (error) {
-        setPageError(error instanceof Error ? error.message : "Autobahnen konnten nicht geladen werden.");
+        showToast(error instanceof Error ? error.message : "Autobahnen konnten nicht geladen werden.");
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -277,16 +205,21 @@ export default function App() {
 
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
     void loadDashboard(session);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
-  async function loadIncidents(roads: string[], allSelected: boolean) {
+  async function loadIncidents(roads: string[]) {
+    if (roads.length === 0) {
+      showToast("Bitte wähle mindestens eine Autobahn aus.");
+      return;
+    }
+
     setLoadingIncidents(true);
-    setPageError(null);
     try {
-      const response = await fetchIncidents(roads, allSelected);
+      const response = await fetchIncidents(roads);
       setIncidentResponse(response);
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : "Meldungen konnten nicht geladen werden.");
+      showToast(error instanceof Error ? error.message : "Meldungen konnten nicht geladen werden.");
     } finally {
       setLoadingIncidents(false);
     }
@@ -299,32 +232,41 @@ export default function App() {
       setDashboard(response);
     } catch (error) {
       setSession(null);
-      setPageError(error instanceof Error ? error.message : "Dashboard konnte nicht geladen werden.");
+      showToast(error instanceof Error ? error.message : "Dashboard konnte nicht geladen werden.");
     } finally {
       setLoadingDashboard(false);
     }
   }
 
-  async function handlePublicSearch() {
-    if (!allPublicRoadsSelected && publicRoads.length === 0) {
-      setPageError("Bitte waehle mindestens eine Autobahn aus oder nutze die Auswahl Alle.");
-      setPublicRoadPickerOpen(true);
-      return;
-    }
-    await loadIncidents(publicRoads, allPublicRoadsSelected);
+  function toggleRoad(road: string) {
+    setSelectedRoads((current) => {
+      if (current.includes(road)) {
+        return current.filter((selected) => selected !== road);
+      }
+      if (current.length >= MAX_SELECTED_ROADS) {
+        showToast(`Maximal ${MAX_SELECTED_ROADS} Autobahnen gleichzeitig auswählen.`);
+        return current;
+      }
+      return [...current, road].sort(compareRoads);
+    });
+  }
+
+  function selectMaxRoads() {
+    const limitedRoads = availableRoads.slice(0, MAX_SELECTED_ROADS);
+    setSelectedRoads(limitedRoads);
+    showToast(`Es wurden ${MAX_SELECTED_ROADS} Autobahnen ausgewählt.`);
   }
 
   async function handleLoginSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmittingAuth(true);
-    setPageError(null);
 
     try {
       const response = await login(loginUsername, loginPassword);
       setSession(response);
       setAuthDialogOpen(false);
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : "Login fehlgeschlagen.");
+      showToast(error instanceof Error ? error.message : "Login fehlgeschlagen.");
     } finally {
       setSubmittingAuth(false);
     }
@@ -333,7 +275,6 @@ export default function App() {
   async function handleRegisterSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmittingAuth(true);
-    setPageError(null);
 
     try {
       const response = await register(registerUsername, registerDisplayName, registerPassword);
@@ -341,7 +282,7 @@ export default function App() {
       setAuthDialogOpen(false);
       setAuthMode("login");
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : "Registrierung fehlgeschlagen.");
+      showToast(error instanceof Error ? error.message : "Registrierung fehlgeschlagen.");
     } finally {
       setSubmittingAuth(false);
     }
@@ -350,20 +291,18 @@ export default function App() {
   async function handleCreateRoute(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!session) {
-      setAuthDialogOpen(true);
+      openAuthDialog();
+      showToast("Bitte zuerst einloggen, um ein Preset zu speichern.");
       return;
     }
 
-    const selectedRoads = allRouteRoadsSelected ? availableRoads : routeRoads;
     if (selectedRoads.length === 0) {
-      setPageError("Bitte waehle mindestens eine Autobahn fuer die beobachtete Route aus.");
-      setRouteRoadPickerOpen(true);
+      showToast("Bitte wähle mindestens eine Autobahn aus.");
+      setRoadPickerOpen(true);
       return;
     }
 
     setSubmittingRoute(true);
-    setPageError(null);
-
     try {
       await createRouteWatch(session.token, {
         name: routeName,
@@ -372,11 +311,10 @@ export default function App() {
       });
       setRouteName("");
       setRouteNotes("");
-      setRouteRoads([]);
-      setAllRouteRoadsSelected(false);
       await loadDashboard(session);
+      showToast("Preset wurde gespeichert.");
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : "Route konnte nicht gespeichert werden.");
+      showToast(error instanceof Error ? error.message : "Preset konnte nicht gespeichert werden.");
     } finally {
       setSubmittingRoute(false);
     }
@@ -390,61 +328,10 @@ export default function App() {
     try {
       await deleteRouteWatch(session.token, routeWatchId);
       await loadDashboard(session);
+      showToast("Preset wurde entfernt.");
     } catch (error) {
-      setPageError(error instanceof Error ? error.message : "Route konnte nicht entfernt werden.");
+      showToast(error instanceof Error ? error.message : "Preset konnte nicht entfernt werden.");
     }
-  }
-
-  function toggleAllPublicRoads() {
-    if (allPublicRoadsSelected) {
-      setAllPublicRoadsSelected(false);
-      setPublicRoads([]);
-      return;
-    }
-
-    setAllPublicRoadsSelected(true);
-    setPublicRoads(availableRoads);
-  }
-
-  function toggleSinglePublicRoad(road: string) {
-    if (allPublicRoadsSelected) {
-      const nextRoads = availableRoads.filter((value) => value !== road);
-      setAllPublicRoadsSelected(false);
-      setPublicRoads(nextRoads);
-      return;
-    }
-
-    const nextRoads = toggleRoad(publicRoads, road);
-    if (nextRoads.length === availableRoads.length) {
-      setAllPublicRoadsSelected(true);
-    }
-    setPublicRoads(nextRoads);
-  }
-
-  function toggleAllRouteRoads() {
-    if (allRouteRoadsSelected) {
-      setAllRouteRoadsSelected(false);
-      setRouteRoads([]);
-      return;
-    }
-
-    setAllRouteRoadsSelected(true);
-    setRouteRoads(availableRoads);
-  }
-
-  function toggleSingleRouteRoad(road: string) {
-    if (allRouteRoadsSelected) {
-      const nextRoads = availableRoads.filter((value) => value !== road);
-      setAllRouteRoadsSelected(false);
-      setRouteRoads(nextRoads);
-      return;
-    }
-
-    const nextRoads = toggleRoad(routeRoads, road);
-    if (nextRoads.length === availableRoads.length) {
-      setAllRouteRoadsSelected(true);
-    }
-    setRouteRoads(nextRoads);
   }
 
   function logout() {
@@ -454,16 +341,16 @@ export default function App() {
 
   const groupedIncidents = groupIncidentsByRoad(incidentResponse?.incidents ?? []);
   const stats = incidentResponse?.stats;
+  const filteredRoads = filterRoads(availableRoads, roadSearch);
 
   return (
     <div className="app-shell">
       <header className="hero hero--compact">
         <div className="hero__content">
           <div className="eyebrow">Autobahn Safety Monitor</div>
-          <h1>Gefahren auf deutschen Autobahnen live im Blick.</h1>
+          <h1>Gefahren auf deutschen Autobahnen live im Blick</h1>
           <p className="hero__copy">
-            Die Karte zeigt aktuelle Meldungen der Autobahn API. Darunter findest du die Risikoeinschaetzung,
-            bevor du im unteren Bereich deine beobachteten Strecken zusammenstellst.
+            Eine Karte für aktuelle Meldungen und darunter eine große, zentrale Autobahnauswahl für Suche und Presets.
           </p>
         </div>
         <div className="hero__actions">
@@ -476,14 +363,12 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <button type="button" onClick={() => setAuthDialogOpen(true)}>
+            <button type="button" onClick={openAuthDialog}>
               Login oder Registrierung
             </button>
           )}
         </div>
       </header>
-
-      {pageError ? <div className="error-banner">{pageError}</div> : null}
 
       <main className="content-flow">
         <section className="main-grid main-grid--top">
@@ -506,9 +391,7 @@ export default function App() {
             <div className="panel__header">
               <div>
                 <h2>Meldungen</h2>
-                <p className="info-note">
-                  Nach Autobahn gruppiert, damit du lange Listen schneller ueberblickst.
-                </p>
+                <p className="info-note">Nach Autobahn sortiert und bei vielen Einträgen scrollbar.</p>
               </div>
               <span className="status-chip">
                 {incidentResponse ? `${incidentResponse.incidents.length} Meldungen` : "Wird geladen"}
@@ -516,7 +399,7 @@ export default function App() {
             </div>
             <div className="incident-list incident-list--scroll">
               {groupedIncidents.length === 0 ? (
-                <p className="empty-state">Aktuell liegen fuer die gewaehlten Autobahnen keine Meldungen vor.</p>
+                <p className="empty-state">Aktuell liegen für die gewählten Autobahnen keine Meldungen vor.</p>
               ) : (
                 groupedIncidents.map((group) => (
                   <section key={group.roadId} className="incident-road-group">
@@ -547,7 +430,7 @@ export default function App() {
             label="Warnungen"
             value={stats?.warnings ?? 0}
             tone="warning"
-            hint="Kurzfristige Gefahrenhinweise und Stoerungen."
+            hint="Kurzfristige Gefahrenhinweise und Störungen."
           />
           <StatCard
             label="Sperrungen"
@@ -568,129 +451,117 @@ export default function App() {
             <div>
               <h2>Autobahnauswahl</h2>
               <p className="info-note">
-                Die Liste bleibt eingeklappt und laedt auf Wunsch alle Autobahnen ohne URL-Limit.
+                Eine zentrale Auswahl für Suche und Presets. Beim Start werden 2 zufällige Autobahnen geladen.
               </p>
             </div>
             <div className="controls-actions">
               <span className="status-chip">
-                {allPublicRoadsSelected ? "Filter: Alle Autobahnen" : `${publicRoads.length} Autobahnen aktiv`}
+                {selectionSummary(selectedRoads, availableRoads)}
               </span>
-              <button type="button" onClick={() => void handlePublicSearch()} disabled={loadingIncidents}>
-                {loadingIncidents ? "Suche laeuft..." : "Meldungen laden"}
+              <button type="button" className="ghost-button" onClick={selectMaxRoads}>
+                Alle (max {MAX_SELECTED_ROADS})
+              </button>
+              <button type="button" onClick={() => void loadIncidents(selectedRoads)} disabled={loadingIncidents}>
+                {loadingIncidents ? "Suche läuft..." : "Meldungen laden"}
               </button>
             </div>
           </div>
-          <RoadPicker
-            title="Oeffentliche Suche"
-            description="Waehle einzelne Autobahnen aus oder blende die gesamte Liste mit einem Klick ein."
-            roads={availableRoads}
-            selectedRoads={publicRoads}
-            allSelected={allPublicRoadsSelected}
-            isOpen={publicRoadPickerOpen}
-            searchValue={publicRoadSearch}
-            onToggleOpen={() => setPublicRoadPickerOpen((current) => !current)}
-            onToggleAll={toggleAllPublicRoads}
-            onToggleRoad={toggleSinglePublicRoad}
-            onSearchChange={setPublicRoadSearch}
-          />
+
+          <section className={`road-picker${roadPickerOpen ? " road-picker--open" : ""}`}>
+            <button type="button" className="road-picker__toggle" onClick={() => setRoadPickerOpen((current) => !current)}>
+              <div>
+                <span className="road-picker__label">Autobahnen</span>
+                <strong>{selectionSummary(selectedRoads, availableRoads)}</strong>
+                <p>Maximum {MAX_SELECTED_ROADS} Autobahnen gleichzeitig, um Timeouts zu vermeiden.</p>
+              </div>
+              <span className="road-picker__icon" aria-hidden="true">
+                {roadPickerOpen ? "−" : "+"}
+              </span>
+            </button>
+
+            {roadPickerOpen ? (
+              <div className="road-picker__panel">
+                <label>
+                  Suche
+                  <input
+                    type="text"
+                    value={roadSearch}
+                    onChange={(event) => setRoadSearch(event.target.value)}
+                    placeholder="z. B. A3"
+                  />
+                </label>
+                <div className="road-selector">
+                  {filteredRoads.map((road) => (
+                    <label key={road} className={`road-option${selectedRoads.includes(road) ? " road-option--active" : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={selectedRoads.includes(road)}
+                        onChange={() => toggleRoad(road)}
+                      />
+                      <span>{road}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
+
+          <form className="route-form route-form--inline" onSubmit={handleCreateRoute}>
+            <label>
+              Preset-Name
+              <input
+                type="text"
+                value={routeName}
+                onChange={(event) => setRouteName(event.target.value)}
+                placeholder="z. B. Pendelstrecke Ost"
+                maxLength={80}
+                required
+              />
+            </label>
+            <label>
+              Notiz
+              <textarea
+                value={routeNotes}
+                onChange={(event) => setRouteNotes(event.target.value)}
+                placeholder="optional"
+                maxLength={255}
+              />
+            </label>
+            <button type="submit" disabled={submittingRoute}>
+              {submittingRoute ? "Speichere Preset..." : "Preset speichern"}
+            </button>
+          </form>
         </section>
 
-        <section className="dashboard-grid">
-          <article className="panel">
-            <div className="panel__header">
-              <div>
-                <h2>Persoenliches Dashboard</h2>
-                <p className="info-note">
-                  Beobachtete Strecken mit eigenem Routenrisiko und aktuellen Highlights.
-                </p>
-              </div>
-              {!session ? (
-                <button type="button" className="ghost-button" onClick={() => setAuthDialogOpen(true)}>
-                  Zum Login
-                </button>
-              ) : null}
+        <section className="panel">
+          <div className="panel__header">
+            <div>
+              <h2>Persönliches Dashboard</h2>
+              <p className="info-note">Gespeicherte Presets mit eigenem Routenrisiko und aktuellen Highlights.</p>
             </div>
+          </div>
 
-            {session ? (
-              <div className="dashboard-space">
-                <p className="auth-hint">
-                  Angemeldet als <strong>{session.displayName}</strong>
-                  {session.demoAccount ? " (Demo-Konto)." : "."}
-                </p>
-                {loadingDashboard ? (
-                  <p className="empty-state">Dashboard wird geladen...</p>
-                ) : dashboard && dashboard.routeWatches.length > 0 ? (
-                  <div className="route-grid">
-                    {dashboard.routeWatches.map((routeWatch) => (
-                      <RouteWatchCard key={routeWatch.id} routeWatch={routeWatch} onDelete={handleDeleteRoute} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="empty-state">Noch keine beobachteten Strecken gespeichert.</p>
-                )}
-              </div>
-            ) : (
-              <div className="panel panel--nested panel--cta">
-                <h3>Login nur bei Bedarf</h3>
-                <p>
-                  Der geschuetzte Bereich ist bewusst versteckt. Oeffne den Dialog erst dann, wenn du Strecken
-                  speichern oder dein Demo-Dashboard testen willst.
-                </p>
-                <button type="button" onClick={() => setAuthDialogOpen(true)}>
-                  Dialog oeffnen
-                </button>
-              </div>
-            )}
-          </article>
-
-          <article className="panel">
-            <div className="panel__header">
-              <div>
-                <h2>Route beobachten</h2>
-                <p className="info-note">
-                  Speichere eine Strecke fuer den geschuetzten Endpunkt. Das Formular nutzt dieselbe Autobahnliste.
-                </p>
-              </div>
+          {session ? (
+            <div className="dashboard-space">
+              <p className="auth-hint">
+                Angemeldet als <strong>{session.displayName}</strong>
+                {session.demoAccount ? " (Demo-Konto)." : "."}
+              </p>
+              {loadingDashboard ? (
+                <p className="empty-state">Dashboard wird geladen...</p>
+              ) : dashboard && dashboard.routeWatches.length > 0 ? (
+                <div className="route-grid">
+                  {dashboard.routeWatches.map((routeWatch) => (
+                    <RouteWatchCard key={routeWatch.id} routeWatch={routeWatch} onDelete={handleDeleteRoute} />
+                  ))}
+                </div>
+              ) : (
+                <p className="empty-state">Noch keine Presets gespeichert.</p>
+              )}
             </div>
-            <form className="route-form" onSubmit={handleCreateRoute}>
-              <label>
-                Name der Route
-                <input
-                  type="text"
-                  value={routeName}
-                  onChange={(event) => setRouteName(event.target.value)}
-                  placeholder="z. B. Pendelstrecke Ost"
-                  maxLength={80}
-                  required
-                />
-              </label>
-              <label>
-                Kurznotiz
-                <textarea
-                  value={routeNotes}
-                  onChange={(event) => setRouteNotes(event.target.value)}
-                  placeholder="optional"
-                  maxLength={255}
-                />
-              </label>
-              <RoadPicker
-                title="Autobahnen fuer diese Route"
-                description="Auch hier bleibt die lange Liste eingeklappt und durchsuchbar."
-                roads={availableRoads}
-                selectedRoads={routeRoads}
-                allSelected={allRouteRoadsSelected}
-                isOpen={routeRoadPickerOpen}
-                searchValue={routeRoadSearch}
-                onToggleOpen={() => setRouteRoadPickerOpen((current) => !current)}
-                onToggleAll={toggleAllRouteRoads}
-                onToggleRoad={toggleSingleRouteRoad}
-                onSearchChange={setRouteRoadSearch}
-              />
-              <button type="submit" disabled={submittingRoute}>
-                {submittingRoute ? "Speichere Route..." : "Route speichern"}
-              </button>
-            </form>
-          </article>
+          ) : (
+            <p className="empty-state">Nicht angemeldet. Für das Dashboard bitte oben rechts einloggen.</p>
+          )}
         </section>
       </main>
 
@@ -700,10 +571,10 @@ export default function App() {
             <div className="panel__header">
               <div>
                 <h2>Login und Registrierung</h2>
-                <p className="info-note">Nur fuer den geschuetzten Bereich und das persoenliche Dashboard.</p>
+                <p className="info-note">Nur für den geschützten Bereich und das persönliche Dashboard.</p>
               </div>
               <button type="button" className="ghost-button" onClick={() => setAuthDialogOpen(false)}>
-                Schliessen
+                Schließen
               </button>
             </div>
 
@@ -746,7 +617,7 @@ export default function App() {
                   />
                 </label>
                 <button type="submit" disabled={submittingAuth}>
-                  {submittingAuth ? "Login laeuft..." : "Einloggen"}
+                  {submittingAuth ? "Login läuft..." : "Einloggen"}
                 </button>
               </form>
             ) : (
@@ -778,13 +649,28 @@ export default function App() {
                   />
                 </label>
                 <button type="submit" disabled={submittingAuth}>
-                  {submittingAuth ? "Registrierung laeuft..." : "Konto anlegen"}
+                  {submittingAuth ? "Registrierung läuft..." : "Konto anlegen"}
                 </button>
               </form>
             )}
           </div>
         </div>
       ) : null}
+
+      <div className="toast-stack" aria-live="polite">
+        {toasts.map((toast) => (
+          <div key={toast.id} className="toast">
+            <span>{toast.message}</span>
+            <button
+              type="button"
+              className="toast__close"
+              onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

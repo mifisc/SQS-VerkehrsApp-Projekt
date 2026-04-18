@@ -24,12 +24,10 @@ async function request<T>(path: string, init?: RequestInit, token?: string): Pro
   return response.json() as Promise<T>;
 }
 
-export function fetchIncidents(roads: string[], allSelected: boolean): Promise<IncidentResponse> {
-  const query = allSelected
-    ? "?all=true"
-    : roads.length > 0
-      ? `?roads=${encodeURIComponent(roads.join(","))}`
-      : "";
+export function fetchIncidents(roads: string[]): Promise<IncidentResponse> {
+  const query = roads.length > 0
+    ? `?roads=${encodeURIComponent(roads.join(","))}`
+    : "";
   return request<IncidentResponse>(`/api/public/incidents${query}`);
 }
 
