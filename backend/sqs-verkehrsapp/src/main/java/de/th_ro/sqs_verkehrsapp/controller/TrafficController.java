@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
+import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
 import de.th_ro.sqs_verkehrsapp.service.TrafficService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ public class TrafficController {
     }
 
     @GetMapping("/{roadId}/warnings")
-    public ResponseEntity<String> getWarnings(@PathVariable String roadId) {
+    public ResponseEntity<List<WarningDto>> getWarnings(@PathVariable String roadId) {
         return ResponseEntity.ok(trafficService.loadWarnings(roadId));
     }
 

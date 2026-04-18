@@ -2,6 +2,7 @@ package de.th_ro.sqs_verkehrsapp.service;
 
 import de.th_ro.sqs_verkehrsapp.client.AutobahnApiClient;
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
+import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class TrafficService {
         return autobahnApiClient.getRoadworks(roadId).getRoadworks();
     }
 
-    public String loadWarnings(String roadId) {
-        return autobahnApiClient.getWarnings(roadId);
+    public List<WarningDto> loadWarnings(String roadId) {
+        return autobahnApiClient.getWarnings(roadId).getWarning();
     }
 
     public String loadClosures(String roadId) {
