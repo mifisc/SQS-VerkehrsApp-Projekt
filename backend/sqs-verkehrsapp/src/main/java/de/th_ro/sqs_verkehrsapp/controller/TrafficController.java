@@ -1,0 +1,39 @@
+package de.th_ro.sqs_verkehrsapp.controller;
+
+import de.th_ro.sqs_verkehrsapp.service.TrafficService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/roads")
+public class TrafficController {
+
+    private final TrafficService trafficService;
+
+    public TrafficController(TrafficService trafficService) {
+        this.trafficService = trafficService;
+    }
+
+    @GetMapping("/{roadId}/roadworks")
+    public ResponseEntity<String> getRoadworks(@PathVariable String roadId) {
+        return ResponseEntity.ok(trafficService.loadRoadworks(roadId));
+    }
+
+    @GetMapping("/{roadId}/warnings")
+    public ResponseEntity<String> getWarnings(@PathVariable String roadId) {
+        return ResponseEntity.ok(trafficService.loadWarnings(roadId));
+    }
+
+    @GetMapping("/{roadId}/closures")
+    public ResponseEntity<String> getClosures(@PathVariable String roadId) {
+        return ResponseEntity.ok(trafficService.loadClosures(roadId));
+    }
+
+    @GetMapping("/{roadId}/charging-stations")
+    public ResponseEntity<String> getChargingStations(@PathVariable String roadId) {
+        return ResponseEntity.ok(trafficService.loadChargingStations(roadId));
+    }
+}
