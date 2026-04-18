@@ -38,7 +38,7 @@ public class TrafficController {
         return ResponseEntity.ok(trafficService.loadClosures(roadId));
     }
 
-    @GetMapping("/{roadId}/charging-stations")
+    @GetMapping("/{roadId}/chargingstations")
     public ResponseEntity<List<ChargingStationDto>> getChargingStations(@PathVariable String roadId) {
         return ResponseEntity.ok(trafficService.loadChargingStations(roadId));
     }
