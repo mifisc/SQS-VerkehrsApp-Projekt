@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.dto.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,5 +11,6 @@ import java.util.List;
 @Setter
 public class ClosureResponse {
 
-    private List<ClosureDto> closure;
+    @JsonProperty("closure")
+    private List<ClosureDto> closures;
 }

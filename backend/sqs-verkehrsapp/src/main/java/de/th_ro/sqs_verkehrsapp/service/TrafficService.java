@@ -23,14 +23,14 @@ public class TrafficService {
     }
 
     public List<WarningDto> loadWarnings(String roadId) {
-        return autobahnApiClient.getWarnings(roadId).getWarning();
+        return autobahnApiClient.getWarnings(roadId).getWarnings();
     }
 
     public List<ClosureDto> loadClosures(String roadId) {
-        return autobahnApiClient.getClosures(roadId).getClosure();
+        return autobahnApiClient.getClosures(roadId).getClosures();
     }
 
     public List<ChargingStationDto> loadChargingStations(String roadId) {
-        return autobahnApiClient.getChargingStations(roadId).getElectric_charging_station();
+        return autobahnApiClient.getChargingStations(roadId).getElectricChargingStations();
     }
 }
