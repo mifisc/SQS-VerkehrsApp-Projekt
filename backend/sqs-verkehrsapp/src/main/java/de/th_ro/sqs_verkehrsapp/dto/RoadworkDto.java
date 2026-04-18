@@ -19,7 +19,7 @@ public class RoadworkDto {
     private String extent;
     private String point;
 
-    private CoordinateDto coordinateDto;
+    private Coordinate coordinate;
 
     private List<String> description;
 

@@ -15,7 +15,7 @@ public class ChargingStationDto {
 
     private List<String> routeRecommendation;
 
-    private CoordinateDto coordinateDto;
+    private Coordinate coordinate;
 
     private List<String> footer;
 

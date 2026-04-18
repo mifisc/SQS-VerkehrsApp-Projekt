@@ -14,7 +14,7 @@ public class ClosureDto {
 
     private List<String> routeRecommendation;
 
-    private CoordinateDto coordinateDto;
+    private Coordinate coordinate;
 
     private List<String> footer;
 
