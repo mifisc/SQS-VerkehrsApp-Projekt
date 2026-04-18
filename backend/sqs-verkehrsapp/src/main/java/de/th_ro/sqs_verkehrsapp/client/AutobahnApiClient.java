@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.client;
 
 import de.th_ro.sqs_verkehrsapp.config.AutobahnApiProperties;
+import de.th_ro.sqs_verkehrsapp.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.dto.wrapper.WarningResponse;
@@ -46,11 +47,11 @@ public class AutobahnApiClient {
                 .block();
     }
 
-    public String getChargingStations(String roadId) {
+    public ChargingStationResponse getChargingStations(String roadId) {
         return webClient.get()
                 .uri("/{roadId}/services/electric_charging_station", roadId)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(ChargingStationResponse.class)
                 .block();
     }
 }

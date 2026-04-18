@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.service;
 
 import de.th_ro.sqs_verkehrsapp.client.AutobahnApiClient;
+import de.th_ro.sqs_verkehrsapp.dto.ChargingStationDto;
 import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
 import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
@@ -29,7 +30,7 @@ public class TrafficService {
         return autobahnApiClient.getClosures(roadId).getClosures();
     }
 
-    public String loadChargingStations(String roadId) {
-        return autobahnApiClient.getChargingStations(roadId);
+    public List<ChargingStationDto> loadChargingStations(String roadId) {
+        return autobahnApiClient.getChargingStations(roadId).getElectric_charging_station();
     }
 }

@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
+import de.th_ro.sqs_verkehrsapp.dto.ChargingStationDto;
 import de.th_ro.sqs_verkehrsapp.dto.ClosureDto;
 import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
 import de.th_ro.sqs_verkehrsapp.dto.WarningDto;
@@ -38,7 +39,7 @@ public class TrafficController {
     }
 
     @GetMapping("/{roadId}/charging-stations")
-    public ResponseEntity<String> getChargingStations(@PathVariable String roadId) {
+    public ResponseEntity<List<ChargingStationDto>> getChargingStations(@PathVariable String roadId) {
         return ResponseEntity.ok(trafficService.loadChargingStations(roadId));
     }
 }
