@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.client;
 
 import de.th_ro.sqs_verkehrsapp.config.AutobahnApiProperties;
+import de.th_ro.sqs_verkehrsapp.dto.wrapper.RoadworksResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,11 +20,11 @@ public class AutobahnApiClient {
                 .build();
     }
 
-    public String getRoadworks(String roadId) {
+    public RoadworksResponse getRoadworks(String roadId) {
         return webClient.get()
                 .uri("/{roadId}/services/roadworks", roadId)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(RoadworksResponse.class)
                 .block();
     }
 

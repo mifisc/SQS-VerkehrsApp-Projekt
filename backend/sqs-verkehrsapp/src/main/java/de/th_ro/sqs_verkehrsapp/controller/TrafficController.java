@@ -1,11 +1,14 @@
 package de.th_ro.sqs_verkehrsapp.controller;
 
+import de.th_ro.sqs_verkehrsapp.dto.RoadworkDto;
 import de.th_ro.sqs_verkehrsapp.service.TrafficService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/roads")
@@ -18,7 +21,7 @@ public class TrafficController {
     }
 
     @GetMapping("/{roadId}/roadworks")
-    public ResponseEntity<String> getRoadworks(@PathVariable String roadId) {
+    public ResponseEntity<List<RoadworkDto>> getRoadworks(@PathVariable String roadId) {
         return ResponseEntity.ok(trafficService.loadRoadworks(roadId));
     }
 
