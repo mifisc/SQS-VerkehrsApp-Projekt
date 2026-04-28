@@ -16,7 +16,7 @@ Wie starten:
 
 
 Maintainer:
-Louisa Böhme
+Louisa Böhm
 Zlata Polovka
 Michael Fischermann
 
