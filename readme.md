@@ -18,7 +18,7 @@ Anleitung zum Starten:
 - `docker compose up --build`
 - Frontend: `noch offen`
 - Backend API: `noch offen`
-- ReadTheDocs: `noch offen`
+- ReadTheDocs: `https://app.readthedocs.org/projects/sqs-verkehrsapp/`
 
 Dokumentation der Teamabsprachen:
 ➡️ [Teammeeting](Teammeeting/Teammeeting.md)
