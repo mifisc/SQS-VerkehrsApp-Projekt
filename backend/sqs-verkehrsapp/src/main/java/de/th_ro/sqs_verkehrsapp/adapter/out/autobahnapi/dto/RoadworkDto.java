@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RoadworkDto {
+public class RoadworkDto  extends BaseAutobahnDto {
 
     private String identifier;
     private String title;
@@ -19,7 +19,7 @@ public class RoadworkDto {
     private String extent;
     private String point;
 
-    private Coordinate coordinate;
+    private CoordinateDto coordinateDto;
 
     private List<String> description;
 

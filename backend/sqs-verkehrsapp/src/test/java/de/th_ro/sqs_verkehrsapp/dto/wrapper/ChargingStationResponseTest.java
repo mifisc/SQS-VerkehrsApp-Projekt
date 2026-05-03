@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.dto.wrapper;
 
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ChargingStationResponse;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ class ChargingStationResponseTest {
 
         assertThat(response.getElectricChargingStations()).hasSize(1);
         AssertionsForClassTypes.assertThat(response.getElectricChargingStations().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
-        AssertionsForClassTypes.assertThat(response.getElectricChargingStations().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
+        AssertionsForClassTypes.assertThat(response.getElectricChargingStations().get(0).getCoordinateDto().getLongValue()).isEqualTo("6.964910");
     }
 
 

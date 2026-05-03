@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.dto.wrapper;
 
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ class RoadworksResponseTest {
 
         assertThat(response.getRoadworks()).hasSize(1);
         AssertionsForClassTypes.assertThat(response.getRoadworks().get(0).getIdentifier()).isEqualTo("id-1");
-        AssertionsForClassTypes.assertThat(response.getRoadworks().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
+        AssertionsForClassTypes.assertThat(response.getRoadworks().get(0).getCoordinateDto().getLongValue()).isEqualTo("6.964910");
     }
 
 }

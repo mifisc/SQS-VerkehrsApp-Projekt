@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -8,14 +8,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class WarningDto {
+public class ChargingStationDto extends BaseAutobahnDto {
 
     private String extent;
     private String identifier;
 
     private List<String> routeRecommendation;
 
-    private Coordinate coordinate;
+    private CoordinateDto coordinateDto;
 
     private List<String> footer;
 
@@ -34,5 +34,4 @@ public class WarningDto {
 
     private boolean future;
     private String subtitle;
-    private String startTimestamp;
 }

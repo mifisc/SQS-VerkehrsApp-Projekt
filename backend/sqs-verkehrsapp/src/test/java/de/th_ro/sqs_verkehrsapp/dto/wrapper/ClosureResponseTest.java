@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.dto.wrapper;
 
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -35,7 +36,7 @@ class ClosureResponseTest {
 
         assertThat(response.getClosures()).hasSize(1);
         assertThat(response.getClosures().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
-        assertThat(response.getClosures().get(0).getCoordinate().getLongValue()).isEqualTo("6.964910");
+        assertThat(response.getClosures().get(0).getCoordinateDto().getLongValue()).isEqualTo("6.964910");
     }
 
 }

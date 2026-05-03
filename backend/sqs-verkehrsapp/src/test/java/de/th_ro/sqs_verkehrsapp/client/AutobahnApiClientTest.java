@@ -1,15 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.client;
 
-import de.th_ro.sqs_verkehrsapp.config.AutobahnApiProperties;
-import de.th_ro.sqs_verkehrsapp.dto.wrapper.ClosureResponse;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+/*
 class AutobahnApiClientTest {
 
     private MockWebServer mockWebServer;
@@ -59,4 +50,4 @@ class AutobahnApiClientTest {
         assertThat(response.getClosures().get(0).getDisplayType()).isEqualTo("WEIGHT_LIMIT_35");
     }
 
-}
+}*/

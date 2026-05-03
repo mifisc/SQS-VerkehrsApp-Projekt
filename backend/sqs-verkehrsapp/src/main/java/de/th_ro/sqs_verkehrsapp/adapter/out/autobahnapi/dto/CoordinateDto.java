@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Coordinate {
+public class CoordinateDto {
 
     private String lat;
 
