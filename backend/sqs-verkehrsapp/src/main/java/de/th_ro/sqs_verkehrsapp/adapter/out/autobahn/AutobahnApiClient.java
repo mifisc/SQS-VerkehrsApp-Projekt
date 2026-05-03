@@ -1,30 +1,43 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ChargingStationResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
-import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AutobahnApiClient implements AutobahnApiPort {
+public class AutobahnApiClient {
 
     private final WebClient webClient;
     private final AutobahnApiMapper mapper;
+    private final RoadEventCacheAdapter cacheAdapter;
 
-    public AutobahnApiClient(WebClient webClient, AutobahnApiMapper mapper) {
+    public AutobahnApiClient(WebClient webClient, AutobahnApiMapper mapper, RoadEventCacheAdapter cacheAdapter) {
         this.webClient = webClient;
         this.mapper = mapper;
+        this.cacheAdapter = cacheAdapter;
+    }
+
+    public List<RoadEvent> fetchTrafficEvents(String roadId) {
+        List<RoadEvent> events = new ArrayList<>();
+
+        events.addAll(fetchWarnings(roadId));
+        events.addAll(fetchRoadworks(roadId));
+        events.addAll(fetchClosures(roadId));
+        events.addAll(fetchChargingStations(roadId));
+
+        return events;
     }
 
 
-    @Override
-    public List<RoadEvent> getRoadworks(String roadId) {
+    public List<RoadEvent> fetchRoadworks(String roadId) {
         RoadworksResponse roadworksResponse = webClient.get()
                 .uri("/{roadId}/services/roadworks", roadId)
                 .retrieve()
@@ -34,8 +47,7 @@ public class AutobahnApiClient implements AutobahnApiPort {
         return mapper.mapRoadworks(roadId, roadworksResponse);
     }
 
-    @Override
-    public List<RoadEvent> getWarnings(String roadId) {
+    public List<RoadEvent> fetchWarnings(String roadId) {
         WarningResponse warningResponse = webClient.get()
                 .uri("/{roadId}/services/warning", roadId)
                 .retrieve()
@@ -44,8 +56,7 @@ public class AutobahnApiClient implements AutobahnApiPort {
         return mapper.mapWarnings(roadId, warningResponse);
     }
 
-    @Override
-    public List<RoadEvent> getClosures(String roadId) {
+    public List<RoadEvent> fetchClosures(String roadId) {
 
         ClosureResponse closureResponse = webClient.get()
                 .uri("/{roadId}/services/closure", roadId)
@@ -55,8 +66,7 @@ public class AutobahnApiClient implements AutobahnApiPort {
         return mapper.mapClosures(roadId, closureResponse);
     }
 
-    @Override
-    public List<RoadEvent> getChargingStations(String roadId) {
+    public List<RoadEvent> fetchChargingStations(String roadId) {
 
         ChargingStationResponse chargingStationResponse = webClient.get()
                 .uri("/{roadId}/services/electric_charging_station", roadId)
@@ -65,5 +75,9 @@ public class AutobahnApiClient implements AutobahnApiPort {
                 .block();
 
         return mapper.mapChargingStations(roadId, chargingStationResponse);
+    }
+
+    public List<RoadEvent> getTrafficEventsFallback(String roadId, Throwable throwable) {
+        return cacheAdapter.findByRoadId(roadId);
     }
 }

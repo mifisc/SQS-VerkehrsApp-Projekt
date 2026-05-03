@@ -1,7 +1,7 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.ChargingStationDto;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.ChargingStationDto;
 import lombok.Getter;
 import lombok.Setter;
 

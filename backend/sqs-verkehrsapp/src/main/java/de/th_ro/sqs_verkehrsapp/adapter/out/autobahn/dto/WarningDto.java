@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -8,7 +8,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ClosureDto extends BaseAutobahnDto {
+public class WarningDto extends BaseAutobahnDto {
+
     private String extent;
     private String identifier;
 
