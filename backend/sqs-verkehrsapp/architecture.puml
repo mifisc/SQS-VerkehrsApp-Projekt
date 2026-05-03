@@ -1,15 +1,74 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title SQS VerkehrsApp - Backend Architektur
 
-autonumber
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
 
-== Initialization ==
+actor "User" as User
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+node "Frontend\nReact / Browser" as Frontend
 
-== Repetition ==
+cloud "Autobahn API\nverkehr.autobahn.de" as AutobahnApi
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+package "Spring Boot Backend" {
+
+  package "Adapter In / Web" {
+    component "TrafficController" as TrafficController
+    component "TrafficResponseDto" as TrafficResponseDto
+  }
+
+  package "Application Layer" {
+    interface "TrafficQueryUseCase" as TrafficQueryUseCase
+    component "TrafficService" as TrafficService
+    interface "AutobahnApiPort" as AutobahnApiPort
+  }
+
+  package "Domain Layer" {
+    component "RoadEvent" as RoadEvent
+    component "Coordinate" as Coordinate
+    component "RoadEventType" as RoadEventType
+    component "RiskLevel" as RiskLevel
+    component "RiskScoreCalculator" as RiskScoreCalculator
+  }
+
+  package "Adapter Out / Autobahn API" {
+    component "AutobahnApiClient" as AutobahnApiClient
+    component "AutobahnApiMapper" as AutobahnApiMapper
+    component "External DTOs\nWarningDto, ClosureDto,\nRoadworkDto, ChargingStationDto" as ExternalDtos
+  }
+
+  package "Config" {
+    component "WebClientConfig" as WebClientConfig
+    component "AutobahnApiProperties" as AutobahnApiProperties
+  }
+}
+
+User --> Frontend
+Frontend --> TrafficController : HTTP / REST
+
+TrafficController --> TrafficQueryUseCase
+TrafficController --> TrafficResponseDto
+
+TrafficService ..|> TrafficQueryUseCase
+TrafficService --> AutobahnApiPort
+TrafficService --> RoadEvent
+
+AutobahnApiClient ..|> AutobahnApiPort
+AutobahnApiClient --> AutobahnApiMapper
+AutobahnApiClient --> ExternalDtos
+AutobahnApiClient --> AutobahnApi : WebClient / HTTPS
+
+AutobahnApiMapper --> RoadEvent
+AutobahnApiMapper --> Coordinate
+AutobahnApiMapper --> RiskScoreCalculator
+
+RoadEvent --> Coordinate
+RoadEvent --> RoadEventType
+RoadEvent --> RiskLevel
+
+RiskScoreCalculator --> RiskLevel
+
+WebClientConfig --> AutobahnApiClient
+AutobahnApiProperties --> WebClientConfig
+
 @enduml
