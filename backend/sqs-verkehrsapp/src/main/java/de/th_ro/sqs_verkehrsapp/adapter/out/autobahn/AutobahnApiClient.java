@@ -76,8 +76,4 @@ public class AutobahnApiClient {
 
         return mapper.mapChargingStations(roadId, chargingStationResponse);
     }
-
-    public List<RoadEvent> getTrafficEventsFallback(String roadId, Throwable throwable) {
-        return cacheAdapter.findByRoadId(roadId);
-    }
 }

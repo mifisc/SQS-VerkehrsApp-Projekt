@@ -1,5 +1,5 @@
 @startuml
-title SQS VerkehrsApp - Backend Architektur (Clean + Resilient)
+title SQS VerkehrsApp - Backend Architektur
 
 skinparam packageStyle rectangle
 skinparam componentStyle rectangle
@@ -9,8 +9,6 @@ actor "User" as User
 node "Frontend\nReact / Browser" as Frontend
 
 cloud "Autobahn API\nverkehr.autobahn.de" as AutobahnApi
-
-database "PostgreSQL\nCache DB" as Postgres
 
 package "Spring Boot Backend" {
 
@@ -22,9 +20,7 @@ package "Spring Boot Backend" {
   package "Application Layer" {
     interface "TrafficQueryUseCase" as TrafficQueryUseCase
     component "TrafficService" as TrafficService
-
     interface "AutobahnApiPort" as AutobahnApiPort
-    interface "RoadEventCachePort" as RoadEventCachePort
   }
 
   package "Domain Layer" {
@@ -36,19 +32,9 @@ package "Spring Boot Backend" {
   }
 
   package "Adapter Out / Autobahn API" {
-
-    component "ResilientAutobahnApiAdapter\n(Proxy: Retry, CircuitBreaker, Fallback)" as ResilientAdapter
-
-    component "AutobahnApiClient\n(HTTP Client)" as AutobahnApiClient
+    component "AutobahnApiClient" as AutobahnApiClient
     component "AutobahnApiMapper" as AutobahnApiMapper
-
     component "External DTOs\nWarningDto, ClosureDto,\nRoadworkDto, ChargingStationDto" as ExternalDtos
-  }
-
-  package "Adapter Out / Persistence" {
-    component "RoadEventCacheAdapter" as CacheAdapter
-    component "CachedRoadEventEntity" as CacheEntity
-    component "CachedRoadEventRepository" as CacheRepo
   }
 
   package "Config" {
@@ -57,7 +43,6 @@ package "Spring Boot Backend" {
   }
 }
 
-' --- Flow ---
 User --> Frontend
 Frontend --> TrafficController : HTTP / REST
 
@@ -66,37 +51,23 @@ TrafficController --> TrafficResponseDto
 
 TrafficService ..|> TrafficQueryUseCase
 TrafficService --> AutobahnApiPort
+TrafficService --> RoadEvent
 
-' --- Ports Implementation ---
-ResilientAdapter ..|> AutobahnApiPort
-CacheAdapter ..|> RoadEventCachePort
-
-' --- Proxy Layer ---
-ResilientAdapter --> AutobahnApiClient
-ResilientAdapter --> RoadEventCachePort
-
-' --- External API ---
+AutobahnApiClient ..|> AutobahnApiPort
 AutobahnApiClient --> AutobahnApiMapper
 AutobahnApiClient --> ExternalDtos
 AutobahnApiClient --> AutobahnApi : WebClient / HTTPS
 
-' --- Mapping ---
 AutobahnApiMapper --> RoadEvent
 AutobahnApiMapper --> Coordinate
 AutobahnApiMapper --> RiskScoreCalculator
 
-' --- Domain ---
 RoadEvent --> Coordinate
 RoadEvent --> RoadEventType
 RoadEvent --> RiskLevel
+
 RiskScoreCalculator --> RiskLevel
 
-' --- Cache ---
-CacheAdapter --> CacheRepo
-CacheRepo --> CacheEntity
-CacheAdapter --> Postgres
-
-' --- Config ---
 WebClientConfig --> AutobahnApiClient
 AutobahnApiProperties --> WebClientConfig
 
