@@ -76,4 +76,9 @@ public class AutobahnApiClient {
 
         return mapper.mapChargingStations(roadId, chargingStationResponse);
     }
+
+    //Is used in ResilientAutobahnApiAdapter als Fallbackmethod
+    public List<RoadEvent> getTrafficEventsFallback(String roadId, Throwable throwable) {
+        return cacheAdapter.findByRoadId(roadId);
+    }
 }
