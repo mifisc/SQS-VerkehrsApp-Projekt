@@ -16,12 +16,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TrafficServiceTest {
-
     @Mock
     private AutobahnApiPort autobahnApiPort;
 
@@ -29,7 +27,7 @@ class TrafficServiceTest {
     private TrafficService trafficService;
 
     @Test
-    void shouldReturnAllTrafficEventsInExpectedOrder() {
+    void shouldReturnAllTrafficEventsFromAutobahnApiPort() {
         String roadId = "A1";
 
         RoadEvent warning = event("1", roadId, RoadEventType.WARNING);
@@ -37,34 +35,35 @@ class TrafficServiceTest {
         RoadEvent closure = event("3", roadId, RoadEventType.CLOSURE);
         RoadEvent charging = event("4", roadId, RoadEventType.CHARGING_STATION);
 
-        when(autobahnApiPort.getWarnings(roadId)).thenReturn(List.of(warning));
-        when(autobahnApiPort.getRoadworks(roadId)).thenReturn(List.of(roadwork));
-        when(autobahnApiPort.getClosures(roadId)).thenReturn(List.of(closure));
-        when(autobahnApiPort.getChargingStations(roadId)).thenReturn(List.of(charging));
+        List<RoadEvent> expectedEvents = List.of(
+                warning,
+                roadwork,
+                closure,
+                charging
+        );
+
+        when(autobahnApiPort.getTrafficEvents(roadId))
+                .thenReturn(expectedEvents);
 
         List<RoadEvent> result = trafficService.getTrafficEvents(roadId);
 
-        assertThat(result).containsExactly(warning, roadwork, closure, charging);
+        assertThat(result).containsExactlyElementsOf(expectedEvents);
 
-        InOrder inOrder = inOrder(autobahnApiPort);
-        inOrder.verify(autobahnApiPort).getWarnings(roadId);
-        inOrder.verify(autobahnApiPort).getRoadworks(roadId);
-        inOrder.verify(autobahnApiPort).getClosures(roadId);
-        inOrder.verify(autobahnApiPort).getChargingStations(roadId);
+        verify(autobahnApiPort).getTrafficEvents(roadId);
     }
 
     @Test
     void shouldReturnEmptyListWhenNoEventsExist() {
         String roadId = "A2";
 
-        when(autobahnApiPort.getWarnings(roadId)).thenReturn(List.of());
-        when(autobahnApiPort.getRoadworks(roadId)).thenReturn(List.of());
-        when(autobahnApiPort.getClosures(roadId)).thenReturn(List.of());
-        when(autobahnApiPort.getChargingStations(roadId)).thenReturn(List.of());
+        when(autobahnApiPort.getTrafficEvents(roadId))
+                .thenReturn(List.of());
 
         List<RoadEvent> result = trafficService.getTrafficEvents(roadId);
 
         assertThat(result).isEmpty();
+
+        verify(autobahnApiPort).getTrafficEvents(roadId);
     }
 
     private RoadEvent event(String id, String roadId, RoadEventType type) {

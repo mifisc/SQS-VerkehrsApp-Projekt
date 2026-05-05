@@ -1,9 +1,12 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ChargingStationResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiClient;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiMapper;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
@@ -13,6 +16,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -24,10 +30,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class AutobahnApiClientTest {
 
-    private MockWebServer mockWebServer;
+    @Mock
     private AutobahnApiMapper mapper;
+
+    @Mock
+    private RoadEventCacheAdapter cacheAdapter;
+
+    private MockWebServer mockWebServer;
+
     private AutobahnApiClient client;
 
     @BeforeEach
@@ -39,8 +52,7 @@ class AutobahnApiClientTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        mapper = mock(AutobahnApiMapper.class);
-        client = new AutobahnApiClient(webClient, mapper);
+        client = new AutobahnApiClient(webClient, mapper, cacheAdapter);
     }
 
     @AfterEach
@@ -49,138 +61,105 @@ class AutobahnApiClientTest {
     }
 
     @Test
-    void shouldFetchRoadworksAndMapResponse() throws Exception {
-        mockWebServer.enqueue(json("""
-                {
-                  "roadworks": [
-                    {
-                      "identifier": "r1",
-                      "title": "Roadwork",
-                      "subtitle": "A subtitle",
-                      "description": ["Desc"],
-                      "coordinate": {
-                        "lat": "50.0",
-                        "long": "8.0"
-                      }
-                    }
-                  ]
-                }
-                """));
-
-        List<RoadEvent> expected = List.of(event("r1", RoadEventType.ROADWORK));
-        when(mapper.mapRoadworks(eq("A1"), any(RoadworksResponse.class)))
-                .thenReturn(expected);
-
-        List<RoadEvent> result = client.getRoadworks("A1");
-
-        assertThat(result).isEqualTo(expected);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A1/services/roadworks");
-
-        verify(mapper).mapRoadworks(eq("A1"), any(RoadworksResponse.class));
-    }
-
-    @Test
-    void shouldFetchWarningsAndMapResponse() throws Exception {
-        mockWebServer.enqueue(json("""
-                {
-                  "warning": [
-                    {
-                      "identifier": "w1",
-                      "title": "Warning",
-                      "coordinate": {
-                        "lat": "50.0",
-                        "long": "8.0"
-                      }
-                    }
-                  ]
-                }
-                """));
-
-        List<RoadEvent> expected = List.of(event("w1", RoadEventType.WARNING));
-        when(mapper.mapWarnings(eq("A2"), any(WarningResponse.class)))
-                .thenReturn(expected);
-
-        List<RoadEvent> result = client.getWarnings("A2");
-
-        assertThat(result).isEqualTo(expected);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A2/services/warning");
-    }
-
-    @Test
-    void shouldFetchClosuresAndMapResponse() throws Exception {
-        mockWebServer.enqueue(json("""
-                {
-                  "closure": [
-                    {
-                      "identifier": "c1",
-                      "title": "Closure",
-                      "coordinate": {
-                        "lat": "50.0",
-                        "long": "8.0"
-                      }
-                    }
-                  ]
-                }
-                """));
-
-        List<RoadEvent> expected = List.of(event("c1", RoadEventType.CLOSURE));
-        when(mapper.mapClosures(eq("A3"), any(ClosureResponse.class)))
-                .thenReturn(expected);
-
-        List<RoadEvent> result = client.getClosures("A3");
-
-        assertThat(result).isEqualTo(expected);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A3/services/closure");
-    }
-
-    @Test
-    void shouldFetchChargingStationsAndMapResponse() throws Exception {
-        mockWebServer.enqueue(json("""
-                {
-                  "electric_charging_station": [
-                    {
-                      "identifier": "e1",
-                      "title": "Charging",
-                      "coordinate": {
-                        "lat": "50.0",
-                        "long": "8.0"
-                      }
-                    }
-                  ]
-                }
-                """));
-
-        List<RoadEvent> expected = List.of(event("e1", RoadEventType.CHARGING_STATION));
-        when(mapper.mapChargingStations(eq("A4"), any(ChargingStationResponse.class)))
-                .thenReturn(expected);
-
-        List<RoadEvent> result = client.getChargingStations("A4");
-
-        assertThat(result).isEqualTo(expected);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A4/services/electric_charging_station");
-    }
-
-    private MockResponse json(String body) {
-        return new MockResponse()
+    void fetchTrafficEvents_shouldFetchAndCombineAllEventTypes() {
+        mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
-                .setHeader("Content-Type", "application/json")
-                .setBody(body);
-    }
+                .setBody("""
+                        {
+                          "warning": []
+                        }
+                        """)
+                .addHeader("Content-Type", "application/json"));
 
-    private RoadEvent event(String id, RoadEventType type) {
-        return new RoadEvent(
-                id,
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("""
+                        {
+                          "roadworks": []
+                        }
+                        """)
+                .addHeader("Content-Type", "application/json"));
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("""
+                        {
+                          "closure": []
+                        }
+                        """)
+                .addHeader("Content-Type", "application/json"));
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody("""
+                        {
+                          "electric_charging_station": []
+                        }
+                        """)
+                .addHeader("Content-Type", "application/json"));
+
+        RoadEvent warning = new RoadEvent(
+                "warning-1",
                 "A1",
-                "Title",
-                "Subtitle",
-                "Description",
-                type,
-                new Coordinate(50.0, 8.0),
-                RiskLevel.MEDIUM
+                "Warnung",
+                "Achtung",
+                "",
+                RoadEventType.WARNING,
+                new Coordinate(52.1, 13.4),
+                null
         );
+
+        RoadEvent roadwork = new RoadEvent(
+                "roadwork-1",
+                "A1",
+                "Baustelle",
+                "Baustelle voraus",
+                "",
+                RoadEventType.ROADWORK,
+                new Coordinate(52.2, 13.5),
+                null
+        );
+
+        RoadEvent closure = new RoadEvent(
+                "closure-1",
+                "A1",
+                "Sperrung",
+                "gesperrt",
+                "",
+                RoadEventType.CLOSURE,
+                new Coordinate(52.3, 13.6),
+                null
+        );
+
+        RoadEvent charging = new RoadEvent(
+                "charging-1",
+                "A1",
+                "Ladesäule",
+                "frei",
+                "",
+                RoadEventType.CHARGING_STATION,
+                new Coordinate(52.4, 13.7),
+                null
+        );
+
+        when(mapper.mapWarnings(eq("A1"), any(WarningResponse.class)))
+                .thenReturn(List.of(warning));
+
+        when(mapper.mapRoadworks(eq("A1"), any(RoadworksResponse.class)))
+                .thenReturn(List.of(roadwork));
+
+        when(mapper.mapClosures(eq("A1"), any(ClosureResponse.class)))
+                .thenReturn(List.of(closure));
+
+        when(mapper.mapChargingStations(eq("A1"), any(ChargingStationResponse.class)))
+                .thenReturn(List.of(charging));
+
+        List<RoadEvent> result = client.fetchTrafficEvents("A1");
+
+        assertEquals(4, result.size());
+        assertTrue(result.contains(warning));
+        assertTrue(result.contains(roadwork));
+        assertTrue(result.contains(closure));
+        assertTrue(result.contains(charging));
     }
 }

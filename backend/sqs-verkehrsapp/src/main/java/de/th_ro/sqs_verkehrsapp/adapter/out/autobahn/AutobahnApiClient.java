@@ -5,6 +5,7 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
+import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AutobahnApiClient {
+public class AutobahnApiClient implements AutobahnApiPort {
 
     private final WebClient webClient;
     private final AutobahnApiMapper mapper;
@@ -23,6 +24,11 @@ public class AutobahnApiClient {
         this.webClient = webClient;
         this.mapper = mapper;
         this.cacheAdapter = cacheAdapter;
+    }
+
+    @Override
+    public List<RoadEvent> getTrafficEvents(String roadId) {
+        return fetchTrafficEvents(roadId);
     }
 
     public List<RoadEvent> fetchTrafficEvents(String roadId) {
