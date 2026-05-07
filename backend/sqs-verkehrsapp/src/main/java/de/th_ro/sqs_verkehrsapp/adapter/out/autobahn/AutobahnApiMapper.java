@@ -10,10 +10,9 @@ import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AutobahnApiMapper {
@@ -82,13 +81,21 @@ public class AutobahnApiMapper {
     }
 
     private Coordinate mapCoordinate(CoordinateDto dto) {
-        if (dto == null) {
+        if (dto == null || isBlank(dto.getLat()) || isBlank(dto.getLongValue())) {
             return new Coordinate(0.0, 0.0);
         }
 
         return new Coordinate(
-                Double.parseDouble(dto.getLat()),
-                Double.parseDouble(dto.getLongValue())
+                parseCoordinate(dto.getLat()),
+                parseCoordinate(dto.getLongValue())
         );
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private double parseCoordinate(String value) {
+        return Double.parseDouble(value.replace(",", "."));
     }
 }
