@@ -1,18 +1,15 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class AutobahnApiClient implements AutobahnApiPort {
@@ -39,8 +36,6 @@ public class AutobahnApiClient implements AutobahnApiPort {
         events.addAll(fetchWarnings(roadId));
         events.addAll(fetchRoadworks(roadId));
         events.addAll(fetchClosures(roadId));
-        events.addAll(fetchChargingStations(roadId));
-
         return events;
     }
 

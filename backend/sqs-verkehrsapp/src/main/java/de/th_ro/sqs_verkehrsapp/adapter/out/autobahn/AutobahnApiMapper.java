@@ -1,8 +1,7 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.BaseAutobahnDto;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.CoordinateDto;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;

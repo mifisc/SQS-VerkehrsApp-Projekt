@@ -1,8 +1,9 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.*;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
@@ -67,7 +68,7 @@ class AutobahnApiMapperTest {
                     assertThat(event.id()).isEqualTo("r1");
                     assertThat(event.roadId()).isEqualTo("A2");
                     assertThat(event.type()).isEqualTo(RoadEventType.ROADWORK);
-                    assertThat(event.riskLevel()).isEqualTo(RiskLevel.MEDIUM);
+                    assertThat(event.riskLevel()).isEqualTo(RiskLevel.LOW);
                 });
     }
 

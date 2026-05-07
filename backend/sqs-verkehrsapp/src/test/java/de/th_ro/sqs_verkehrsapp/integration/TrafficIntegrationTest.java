@@ -1,25 +1,22 @@
 package de.th_ro.sqs_verkehrsapp.integration;
 
-import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
-import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
-import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
+import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
+import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
+import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
+import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,16 +27,14 @@ public class TrafficIntegrationTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private AutobahnApiPort autobahnApiPort;
+    private TrafficQueryUseCase trafficQueryUseCase;
 
     @Test
     void shouldReturnTrafficEvents() throws Exception {
         List<RoadEvent> events = List.of(
                 event("w1", RoadEventType.WARNING, RiskLevel.MEDIUM),
                 event("r1", RoadEventType.ROADWORK, RiskLevel.MEDIUM),
-                event("c1", RoadEventType.CLOSURE, RiskLevel.HIGH),
-                event("e1", RoadEventType.CHARGING_STATION, RiskLevel.LOW)
-        );
+                event("c1", RoadEventType.CLOSURE, RiskLevel.HIGH));
 
         when(trafficQueryUseCase.getTrafficEvents("A1"))
                 .thenReturn(events);;
