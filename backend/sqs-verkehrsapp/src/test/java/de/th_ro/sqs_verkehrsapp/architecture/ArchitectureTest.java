@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.architecture;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -17,16 +18,43 @@ import org.springframework.web.bind.annotation.RestController;
 class ArchitectureTest {
 
     @ArchTest
-    static final ArchRule controllersShouldBeInAdapterInPackage =
+    static final ArchRule controllersShouldBeInWebAdapterPackage =
             classes()
                     .that().areAnnotatedWith(RestController.class)
-                    .should().resideInAPackage("..adapter.in..");
+                    .should().resideInAPackage("..adapter.in.web..");
 
     @ArchTest
-    static final ArchRule servicesShouldBeInApplicationPackage =
+    static final ArchRule dtoClassesOfWebAdapterShouldBeInDtoPackage =
+            classes()
+                    .that().haveSimpleNameEndingWith("Dto")
+                    .and().resideInAPackage("..adapter.in.web..")
+                    .should().resideInAPackage("..adapter.in.web.dto..");
+
+    @ArchTest
+    static final ArchRule servicesShouldBeInApplicationServicePackage =
             classes()
                     .that().areAnnotatedWith(Service.class)
-                    .should().resideInAPackage("..application..");
+                    .should().resideInAPackage("..application.service..");
+
+    @ArchTest
+    static final ArchRule applicationPortsShouldBeInterfaces =
+            classes()
+                    .that().resideInAPackage("..application.port..")
+                    .should().beInterfaces();
+
+    @ArchTest
+    static final ArchRule incomingPortsShouldOnlyBeInApplicationPortInPackage =
+            classes()
+                    .that().haveSimpleNameEndingWith("UseCase")
+                    .should().resideInAPackage("..application.port.in..")
+                    .andShould().beInterfaces();
+
+    @ArchTest
+    static final ArchRule outgoingPortsShouldOnlyBeInApplicationPortOutPackage =
+            classes()
+                    .that().haveSimpleNameEndingWith("Port")
+                    .should().resideInAPackage("..application.port.out..")
+                    .andShould().beInterfaces();
 
     @ArchTest
     static final ArchRule domainShouldNotDependOnSpring =
@@ -36,6 +64,13 @@ class ArchitectureTest {
                     .resideInAnyPackage("org.springframework..");
 
     @ArchTest
+    static final ArchRule domainShouldNotDependOnApplication =
+            noClasses()
+                    .that().resideInAPackage("..domain..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..application..");
+
+    @ArchTest
     static final ArchRule domainShouldNotDependOnAdapters =
             noClasses()
                     .that().resideInAPackage("..domain..")
@@ -43,31 +78,62 @@ class ArchitectureTest {
                     .resideInAnyPackage("..adapter..");
 
     @ArchTest
-    static final ArchRule applicationShouldNotDependOnWebAdapter =
+    static final ArchRule applicationShouldNotDependOnAdapters =
             noClasses()
                     .that().resideInAPackage("..application..")
                     .should().dependOnClassesThat()
-                    .resideInAnyPackage("..adapter.in..");
+                    .resideInAnyPackage("..adapter..");
 
     @ArchTest
-    static final ArchRule applicationShouldNotDependOnAutobahnAdapter =
+    static final ArchRule incomingAdaptersShouldNotDependOnOutgoingAdapters =
             noClasses()
-                    .that().resideInAPackage("..application..")
+                    .that().resideInAPackage("..adapter.in..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..adapter.out..");
 
     @ArchTest
-    static final ArchRule portsShouldBeInterfaces =
-            classes()
-                    .that().resideInAPackage("..port..")
-                    .should().beInterfaces();
+    static final ArchRule outgoingAdaptersShouldNotDependOnIncomingAdapters =
+            noClasses()
+                    .that().resideInAPackage("..adapter.out..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..adapter.in..");
 
     @ArchTest
-    static final ArchRule controllersShouldOnlyBeAccessedBySpringOrTests =
+    static final ArchRule webAdapterShouldOnlyAccessIncomingPorts =
+            noClasses()
+                    .that().resideInAPackage("..adapter.in.web..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..application.port.out..");
+
+    @ArchTest
+    static final ArchRule outgoingAdaptersShouldOnlyAccessOutgoingPorts =
+            noClasses()
+                    .that().resideInAPackage("..adapter.out..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..application.port.in..");
+
+    @ArchTest
+    static final ArchRule configMayWireAdaptersButDomainMustStayClean =
+            noClasses()
+                    .that().resideInAPackage("..domain..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..config..");
+
+    @ArchTest
+    static final ArchRule persistenceEntitiesShouldStayInPersistenceAdapter =
             classes()
-                    .that().resideInAPackage("..adapter.in..")
-                    .should().onlyBeAccessed().byAnyPackage(
-                            "..adapter.in..",
-                            "org.springframework.."
-                    );
+                    .that().haveSimpleNameEndingWith("Entity")
+                    .should().resideInAPackage("..adapter.out..persistence..");
+
+    @ArchTest
+    static final ArchRule repositoriesShouldStayInPersistenceAdapter =
+            classes()
+                    .that().haveSimpleNameEndingWith("Repository")
+                    .should().resideInAPackage("..adapter.out..persistence..");
+
+    @ArchTest
+    static final ArchRule apiClientsAndMappersShouldStayInAutobahnAdapter =
+            classes()
+                    .that().haveNameMatching(".*(ApiClient|ApiMapper)")
+                    .should().resideInAPackage("..adapter.out.autobahn..");
 }
