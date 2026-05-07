@@ -68,4 +68,9 @@ public class AutobahnApiClient implements AutobahnApiPort {
                 .block();
         return mapper.mapClosures(roadId, closureResponse);
     }
+
+    //Is used in ResilientAutobahnApiAdapter als Fallbackmethod
+    public List<RoadEvent> getTrafficEventsFallback(String roadId, Throwable throwable) {
+        return cacheAdapter.findByRoadId(roadId);
+    }
 }

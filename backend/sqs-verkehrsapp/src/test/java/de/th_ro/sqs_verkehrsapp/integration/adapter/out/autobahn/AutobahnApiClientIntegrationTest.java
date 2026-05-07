@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiClient;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiMapper;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
@@ -52,12 +51,10 @@ public class AutobahnApiClientIntegrationTest {
         mockWebServer.enqueue(jsonResponse("{}"));
         mockWebServer.enqueue(jsonResponse("{}"));
         mockWebServer.enqueue(jsonResponse("{}"));
-        mockWebServer.enqueue(jsonResponse("{}"));
 
         RoadEvent warning = mock(RoadEvent.class);
         RoadEvent roadwork = mock(RoadEvent.class);
         RoadEvent closure = mock(RoadEvent.class);
-        RoadEvent chargingStation = mock(RoadEvent.class);
 
         when(mapper.mapWarnings(eq("A1"), any(WarningResponse.class)))
                 .thenReturn(List.of(warning));
@@ -65,13 +62,11 @@ public class AutobahnApiClientIntegrationTest {
                 .thenReturn(List.of(roadwork));
         when(mapper.mapClosures(eq("A1"), any(ClosureResponse.class)))
                 .thenReturn(List.of(closure));
-        when(mapper.mapChargingStations(eq("A1"), any(ChargingStationResponse.class)))
-                .thenReturn(List.of(chargingStation));
 
         List<RoadEvent> result = client.fetchTrafficEvents("A1");
 
         assertThat(result)
-                .containsExactly(warning, roadwork, closure, chargingStation);
+                .containsExactly(warning, roadwork, closure);
 
         assertThat(mockWebServer.takeRequest().getPath())
                 .isEqualTo("/A1/services/warning");
@@ -79,8 +74,6 @@ public class AutobahnApiClientIntegrationTest {
                 .isEqualTo("/A1/services/roadworks");
         assertThat(mockWebServer.takeRequest().getPath())
                 .isEqualTo("/A1/services/closure");
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A1/services/electric_charging_station");
     }
 
     @Test
@@ -135,24 +128,6 @@ public class AutobahnApiClientIntegrationTest {
                 .isEqualTo("/A8/services/closure");
 
         verify(mapper).mapClosures(eq("A8"), any(ClosureResponse.class));
-    }
-
-    @Test
-    void fetchChargingStations_shouldCallChargingStationEndpointAndMapResponse() throws Exception {
-        mockWebServer.enqueue(jsonResponse("{}"));
-
-        RoadEvent chargingStation = mock(RoadEvent.class);
-
-        when(mapper.mapChargingStations(eq("A9"), any(ChargingStationResponse.class)))
-                .thenReturn(List.of(chargingStation));
-
-        List<RoadEvent> result = client.fetchChargingStations("A9");
-
-        assertThat(result).containsExactly(chargingStation);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A9/services/electric_charging_station");
-
-        verify(mapper).mapChargingStations(eq("A9"), any(ChargingStationResponse.class));
     }
 
     private MockResponse jsonResponse(String body) {

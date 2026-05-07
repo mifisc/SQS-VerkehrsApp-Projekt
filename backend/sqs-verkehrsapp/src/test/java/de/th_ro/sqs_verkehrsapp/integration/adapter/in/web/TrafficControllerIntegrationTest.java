@@ -1,5 +1,10 @@
 package de.th_ro.sqs_verkehrsapp.integration;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import de.th_ro.sqs_verkehrsapp.adapter.in.web.TrafficController;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
