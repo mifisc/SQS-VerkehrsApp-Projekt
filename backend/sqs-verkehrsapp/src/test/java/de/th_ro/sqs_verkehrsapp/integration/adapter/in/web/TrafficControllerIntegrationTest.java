@@ -1,9 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.integration.adapter.in.web;
-
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+package de.th_ro.sqs_verkehrsapp.integration;
 
 import de.th_ro.sqs_verkehrsapp.adapter.in.web.TrafficController;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
@@ -21,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(TrafficController.class)
 public class TrafficControllerIntegrationTest {
 
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -32,20 +28,17 @@ public class TrafficControllerIntegrationTest {
         List<RoadEvent> events = List.of(
                 event("w1", RoadEventType.WARNING, RiskLevel.MEDIUM),
                 event("r1", RoadEventType.ROADWORK, RiskLevel.MEDIUM),
-                event("c1", RoadEventType.CLOSURE, RiskLevel.HIGH),
-                event("e1", RoadEventType.CHARGING_STATION, RiskLevel.LOW)
-        );
+                event("c1", RoadEventType.CLOSURE, RiskLevel.HIGH));
 
         when(trafficQueryUseCase.getTrafficEvents("A1"))
                 .thenReturn(events);;
 
         mockMvc.perform(get("/api/traffic/A1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").value("w1"))
                 .andExpect(jsonPath("$[1].id").value("r1"))
-                .andExpect(jsonPath("$[2].id").value("c1"))
-                .andExpect(jsonPath("$[3].id").value("e1"));
+                .andExpect(jsonPath("$[2].id").value("c1"));
     }
 
     private RoadEvent event(String id, RoadEventType type, RiskLevel riskLevel) {

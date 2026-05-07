@@ -1,17 +1,15 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class AutobahnApiClient implements AutobahnApiPort {
@@ -26,6 +24,7 @@ public class AutobahnApiClient implements AutobahnApiPort {
         this.cacheAdapter = cacheAdapter;
     }
 
+
     @Override
     public List<RoadEvent> getTrafficEvents(String roadId) {
         return fetchTrafficEvents(roadId);
@@ -37,8 +36,6 @@ public class AutobahnApiClient implements AutobahnApiPort {
         events.addAll(fetchWarnings(roadId));
         events.addAll(fetchRoadworks(roadId));
         events.addAll(fetchClosures(roadId));
-        events.addAll(fetchChargingStations(roadId));
-
         return events;
     }
 
@@ -70,21 +67,5 @@ public class AutobahnApiClient implements AutobahnApiPort {
                 .bodyToMono(ClosureResponse.class)
                 .block();
         return mapper.mapClosures(roadId, closureResponse);
-    }
-
-    public List<RoadEvent> fetchChargingStations(String roadId) {
-
-        ChargingStationResponse chargingStationResponse = webClient.get()
-                .uri("/{roadId}/services/electric_charging_station", roadId)
-                .retrieve()
-                .bodyToMono(ChargingStationResponse.class)
-                .block();
-
-        return mapper.mapChargingStations(roadId, chargingStationResponse);
-    }
-
-    //Is used in ResilientAutobahnApiAdapter als Fallbackmethod
-    public List<RoadEvent> getTrafficEventsFallback(String roadId, Throwable throwable) {
-        return cacheAdapter.findByRoadId(roadId);
     }
 }

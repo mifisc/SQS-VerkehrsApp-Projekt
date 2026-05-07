@@ -8,8 +8,8 @@ public class RiskScoreCalculator {
     public RiskLevel calculateRiskLevel(RoadEventType type) {
         return switch (type) {
             case CLOSURE -> RiskLevel.HIGH;
-            case WARNING, ROADWORK -> RiskLevel.MEDIUM;
-            case CHARGING_STATION -> RiskLevel.LOW;
+            case WARNING -> RiskLevel.MEDIUM;
+            case ROADWORK -> RiskLevel.LOW;
         };
     }
 }

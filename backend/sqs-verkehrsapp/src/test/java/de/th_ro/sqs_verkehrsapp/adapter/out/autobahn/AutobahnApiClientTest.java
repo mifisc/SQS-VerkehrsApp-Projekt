@@ -127,17 +127,6 @@ class AutobahnApiClientTest {
                 null
         );
 
-        RoadEvent charging = new RoadEvent(
-                "charging-1",
-                "A1",
-                "Ladesäule",
-                "frei",
-                "",
-                RoadEventType.CHARGING_STATION,
-                new Coordinate(52.4, 13.7),
-                null
-        );
-
         when(mapper.mapWarnings(eq("A1"), any(WarningResponse.class)))
                 .thenReturn(List.of(warning));
 
@@ -147,16 +136,12 @@ class AutobahnApiClientTest {
         when(mapper.mapClosures(eq("A1"), any(ClosureResponse.class)))
                 .thenReturn(List.of(closure));
 
-        when(mapper.mapChargingStations(eq("A1"), any(ChargingStationResponse.class)))
-                .thenReturn(List.of(charging));
-
         List<RoadEvent> result = client.fetchTrafficEvents("A1");
 
-        assertEquals(4, result.size());
+        assertEquals(3, result.size());
         assertTrue(result.contains(warning));
         assertTrue(result.contains(roadwork));
         assertTrue(result.contains(closure));
-        assertTrue(result.contains(charging));
     }
 
     @Test
