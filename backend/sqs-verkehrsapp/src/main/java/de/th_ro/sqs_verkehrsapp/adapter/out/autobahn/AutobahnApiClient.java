@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
@@ -7,6 +7,7 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -25,6 +26,7 @@ public class AutobahnApiClient implements AutobahnApiPort {
         this.mapper = mapper;
         this.cacheAdapter = cacheAdapter;
     }
+
 
     @Override
     public List<RoadEvent> getTrafficEvents(String roadId) {
@@ -70,16 +72,5 @@ public class AutobahnApiClient implements AutobahnApiPort {
                 .bodyToMono(ClosureResponse.class)
                 .block();
         return mapper.mapClosures(roadId, closureResponse);
-    }
-
-    public List<RoadEvent> fetchChargingStations(String roadId) {
-
-        ChargingStationResponse chargingStationResponse = webClient.get()
-                .uri("/{roadId}/services/electric_charging_station", roadId)
-                .retrieve()
-                .bodyToMono(ChargingStationResponse.class)
-                .block();
-
-        return mapper.mapChargingStations(roadId, chargingStationResponse);
     }
 }

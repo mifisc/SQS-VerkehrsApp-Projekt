@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.BaseAutobahnDto;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.CoordinateDto;
@@ -53,17 +53,6 @@ public class AutobahnApiMapper {
         return response.getClosures()
                 .stream()
                 .map(dto -> map(dto, roadId, RoadEventType.CLOSURE))
-                .toList();
-    }
-
-    public List<RoadEvent> mapChargingStations(String roadId, ChargingStationResponse response) {
-        if (response == null || response.getElectricChargingStations() == null) {
-            return Collections.emptyList();
-        }
-
-        return response.getElectricChargingStations()
-                .stream()
-                .map(dto -> map(dto, roadId, RoadEventType.CHARGING_STATION))
                 .toList();
     }
 

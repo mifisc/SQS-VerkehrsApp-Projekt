@@ -11,6 +11,8 @@ import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import java.io.IOException;
+import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;

@@ -1,9 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.integration;
 
-import de.th_ro.sqs_verkehrsapp.adapter.in.web.TrafficController;
-import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
-import de.th_ro.sqs_verkehrsapp.application.service.TrafficService;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
@@ -12,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -20,20 +16,21 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TrafficController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class TrafficIntegrationTest {
+
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TrafficQueryUseCase trafficQueryUseCase;
+    private AutobahnApiPort autobahnApiPort;
 
     @Test
     void shouldReturnTrafficEvents() throws Exception {
@@ -49,11 +46,10 @@ public class TrafficIntegrationTest {
 
         mockMvc.perform(get("/api/traffic/A1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(4))
+                .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").value("w1"))
                 .andExpect(jsonPath("$[1].id").value("r1"))
-                .andExpect(jsonPath("$[2].id").value("c1"))
-                .andExpect(jsonPath("$[3].id").value("e1"));
+                .andExpect(jsonPath("$[2].id").value("c1"));
     }
 
     private RoadEvent event(String id, RoadEventType type, RiskLevel riskLevel) {

@@ -27,7 +27,7 @@ class TrafficServiceTest {
     private TrafficService trafficService;
 
     @Test
-    void shouldReturnAllTrafficEventsFromAutobahnApiPort() {
+    void shouldReturnAllTrafficEventsInExpectedOrder() {
         String roadId = "A1";
 
         RoadEvent warning = event("1", roadId, RoadEventType.WARNING);
