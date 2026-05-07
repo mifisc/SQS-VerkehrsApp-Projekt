@@ -2,9 +2,7 @@ package de.th_ro.sqs_verkehrsapp.domain.logic;
 
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import org.springframework.stereotype.Component;
 
-@Component
 public class RiskScoreCalculator {
 
     public RiskLevel calculateRiskLevel(RoadEventType type) {
