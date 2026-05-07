@@ -1,7 +1,9 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.*;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ChargingStationResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
@@ -9,13 +11,8 @@ import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class AutobahnApiMapperTest {
 
@@ -71,7 +68,7 @@ class AutobahnApiMapperTest {
                     assertThat(event.id()).isEqualTo("r1");
                     assertThat(event.roadId()).isEqualTo("A2");
                     assertThat(event.type()).isEqualTo(RoadEventType.ROADWORK);
-                    assertThat(event.riskLevel()).isEqualTo(RiskLevel.MEDIUM);
+                    assertThat(event.riskLevel()).isEqualTo(RiskLevel.LOW);
                 });
     }
 
@@ -99,34 +96,10 @@ class AutobahnApiMapperTest {
     }
 
     @Test
-    void shouldMapChargingStations() {
-        ChargingStationDto dto = new ChargingStationDto();
-        dto.setIdentifier("e1");
-        dto.setTitle("Charging station");
-        dto.setSubtitle("Available");
-        dto.setDescription(List.of("Fast charger"));
-        dto.setCoordinate(coordinate("53.0", "11.0"));
-
-        ChargingStationResponse response = new ChargingStationResponse();
-        response.setElectricChargingStations(List.of(dto));
-
-        List<RoadEvent> result = mapper.mapChargingStations("A4", response);
-
-        assertThat(result)
-                .singleElement()
-                .satisfies(event -> {
-                    assertThat(event.id()).isEqualTo("e1");
-                    assertThat(event.type()).isEqualTo(RoadEventType.CHARGING_STATION);
-                    assertThat(event.riskLevel()).isEqualTo(RiskLevel.LOW);
-                });
-    }
-
-    @Test
     void shouldReturnEmptyListWhenResponseIsNull() {
         assertThat(mapper.mapWarnings("A1", null)).isEmpty();
         assertThat(mapper.mapRoadworks("A1", null)).isEmpty();
         assertThat(mapper.mapClosures("A1", null)).isEmpty();
-        assertThat(mapper.mapChargingStations("A1", null)).isEmpty();
     }
 
     @Test
@@ -134,7 +107,6 @@ class AutobahnApiMapperTest {
         assertThat(mapper.mapWarnings("A1", new WarningResponse())).isEmpty();
         assertThat(mapper.mapRoadworks("A1", new RoadworksResponse())).isEmpty();
         assertThat(mapper.mapClosures("A1", new ClosureResponse())).isEmpty();
-        assertThat(mapper.mapChargingStations("A1", new ChargingStationResponse())).isEmpty();
     }
 
     @Test

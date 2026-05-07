@@ -1,6 +1,10 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ChargingStationResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
@@ -8,21 +12,14 @@ import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import java.io.IOException;
+import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.io.IOException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 class AutobahnApiClientTest {
 
@@ -134,34 +131,6 @@ class AutobahnApiClientTest {
         assertThat(result).isEqualTo(expected);
         assertThat(mockWebServer.takeRequest().getPath())
                 .isEqualTo("/A3/services/closure");
-    }
-
-    @Test
-    void shouldFetchChargingStationsAndMapResponse() throws Exception {
-        mockWebServer.enqueue(json("""
-                {
-                  "electric_charging_station": [
-                    {
-                      "identifier": "e1",
-                      "title": "Charging",
-                      "coordinate": {
-                        "lat": "50.0",
-                        "long": "8.0"
-                      }
-                    }
-                  ]
-                }
-                """));
-
-        List<RoadEvent> expected = List.of(event("e1", RoadEventType.CHARGING_STATION));
-        when(mapper.mapChargingStations(eq("A4"), any(ChargingStationResponse.class)))
-                .thenReturn(expected);
-
-        List<RoadEvent> result = client.getChargingStations("A4");
-
-        assertThat(result).isEqualTo(expected);
-        assertThat(mockWebServer.takeRequest().getPath())
-                .isEqualTo("/A4/services/electric_charging_station");
     }
 
     private MockResponse json(String body) {
