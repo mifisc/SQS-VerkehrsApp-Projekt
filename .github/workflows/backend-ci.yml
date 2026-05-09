@@ -1,0 +1,32 @@
+name: Backend CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  maven:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend/sqs-verkehrsapp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Compile
+        run: ./mvnw -B compile
+
+      - name: Verify
+        run: ./mvnw -B verify
