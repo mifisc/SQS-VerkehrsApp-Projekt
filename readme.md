@@ -15,9 +15,14 @@ Planung:
 - Persönliches Dashboard
 
 Anleitung zum Starten:
-- `docker compose up --build`
-- Frontend: `noch offen`
-- Backend API: `noch offen`
+- Gesamtes Projekt mit Docker starten: `docker compose up --build`
+- Frontend mit Docker Compose: `http://localhost:3000`
+- Backend API mit Docker Compose: `http://localhost:8080`
+- Frontend lokal ohne Docker starten:
+  - `cd frontend`
+  - `npm install`
+  - `npm run dev`
+  - Vite stellt das Frontend dann unter `http://localhost:5173` bereit
 - ReadTheDocs: `https://sqs-verkehrsapp.readthedocs.io/de/latest/`
 
 Dokumentation der Teamabsprachen:
@@ -27,4 +32,3 @@ Projektbeteiligte:
 - Louisa Böhm
 - Zlata Polovka
 - Michael Fischermann
-
