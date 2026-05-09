@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.adapter.in.web;
 
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
+import de.th_ro.sqs_verkehrsapp.domain.exception.TrafficDataUnavailableException;
 import de.th_ro.sqs_verkehrsapp.domain.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TrafficController.class)
+@WebMvcTest({TrafficController.class, GlobalExceptionHandler.class})
 class TrafficControllerTest {
 
     @Autowired
@@ -84,5 +85,22 @@ class TrafficControllerTest {
                 .andExpect(jsonPath("$.live").value(false))
                 .andExpect(jsonPath("$.cachedAt").doesNotExist())
                 .andExpect(jsonPath("$.events.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn503WhenTrafficDataUnavailable() throws Exception {
+        when(trafficQueryUseCase.getTrafficEvents("A8"))
+                .thenThrow(new TrafficDataUnavailableException(
+                        "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für A8",
+                        new RuntimeException()
+                ));
+
+        mockMvc.perform(get("/api/traffic/A8"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("TRAFFIC_DATA_UNAVAILABLE"))
+                .andExpect(jsonPath("$.message").value(
+                        "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für A8"
+                ))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }

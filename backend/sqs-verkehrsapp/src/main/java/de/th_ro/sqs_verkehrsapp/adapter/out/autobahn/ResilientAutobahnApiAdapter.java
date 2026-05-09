@@ -2,6 +2,7 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.application.port.out.RoadEventCachePort;
+import de.th_ro.sqs_verkehrsapp.domain.exception.TrafficDataUnavailableException;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -43,6 +44,19 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
     }
 
     public TrafficEventsResult getTrafficEventsFallback(String roadId, Throwable throwable) {
-        return cachePort.findByRoadId(roadId);
+        TrafficEventsResult cachedResult = cachePort.findByRoadId(roadId);
+
+        if (cachedResult != null && cachedResult.events() != null && !cachedResult.events().isEmpty()) {
+            return new TrafficEventsResult(
+                    cachedResult.events(),
+                    false,
+                    cachedResult.cachedAt()
+            );
+        }
+
+        throw new TrafficDataUnavailableException(
+                "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für " + roadId,
+                throwable
+        );
     }
 }

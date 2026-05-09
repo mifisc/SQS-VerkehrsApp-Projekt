@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
 import de.th_ro.sqs_verkehrsapp.application.port.out.RoadEventCachePort;
+import de.th_ro.sqs_verkehrsapp.domain.exception.TrafficDataUnavailableException;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,5 +87,21 @@ class ResilientAutobahnApiAdapterTest {
 
         verify(cachePort).findByRoadId("A1");
         verifyNoInteractions(autobahnApiClient);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenApiFailsAndCacheIsEmpty() {
+        String roadId = "A8";
+
+        when(cachePort.findByRoadId(roadId))
+                .thenReturn(null);
+
+        assertThrows(
+                TrafficDataUnavailableException.class,
+                () -> adapter.getTrafficEventsFallback(
+                        roadId,
+                        new RuntimeException("API nicht verfügbar")
+                )
+        );
     }
 }

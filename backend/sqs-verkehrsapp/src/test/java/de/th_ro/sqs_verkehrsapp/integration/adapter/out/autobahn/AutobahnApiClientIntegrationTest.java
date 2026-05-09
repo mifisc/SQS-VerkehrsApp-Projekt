@@ -5,6 +5,7 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiMapper;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.domain.exception.ExternalTrafficApiException;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class AutobahnApiClientIntegrationTest {
@@ -126,6 +129,18 @@ public class AutobahnApiClientIntegrationTest {
                 .isEqualTo("/A8/services/closure");
 
         verify(mapper).mapClosures(eq("A8"), any(ClosureResponse.class));
+    }
+
+    @Test
+    void shouldThrowExternalTrafficApiExceptionWhenApiReturnsServerError() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        ExternalTrafficApiException exception = assertThrows(
+                ExternalTrafficApiException.class,
+                () -> client.fetchTrafficEvents("A8")
+        );
+
+        assertTrue(exception.getMessage().contains("A8"));
     }
 
     private MockResponse jsonResponse(String body) {
