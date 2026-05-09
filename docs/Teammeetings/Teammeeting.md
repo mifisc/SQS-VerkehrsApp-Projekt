@@ -6,9 +6,8 @@ Hier sind alle Team-Meetings zentral gesammelt.
 
 ## 📅 Meetings
 
-### 28.04.2026
-
 ➡️ [Meeting 28.04.2026](Meetings/28-04-26.md)
+➡️ [Meeting 08.05.2026](Meetings/08-05-26.md)
 
 ---
 
