@@ -1,17 +1,11 @@
 package de.th_ro.sqs_verkehrsapp.integration.adapter.out.autobahn;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiClient;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.AutobahnApiMapper;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import java.io.IOException;
-import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -19,11 +13,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 public class AutobahnApiClientIntegrationTest {
 
     private MockWebServer mockWebServer;
     private AutobahnApiMapper mapper;
-    private RoadEventCacheAdapter cacheAdapter;
     private AutobahnApiClient client;
 
     @BeforeEach
@@ -36,9 +35,8 @@ public class AutobahnApiClientIntegrationTest {
                 .build();
 
         mapper = mock(AutobahnApiMapper.class);
-        cacheAdapter = mock(RoadEventCacheAdapter.class);
 
-        client = new AutobahnApiClient(webClient, mapper, cacheAdapter);
+        client = new AutobahnApiClient(webClient, mapper);
     }
 
     @AfterEach

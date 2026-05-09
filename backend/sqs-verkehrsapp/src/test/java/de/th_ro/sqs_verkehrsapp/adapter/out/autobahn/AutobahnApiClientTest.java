@@ -1,20 +1,11 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import java.io.IOException;
-import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -25,14 +16,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class AutobahnApiClientTest {
 
     @Mock
     private AutobahnApiMapper mapper;
-
-    @Mock
-    private RoadEventCacheAdapter cacheAdapter;
 
     private MockWebServer mockWebServer;
 
@@ -47,7 +44,7 @@ class AutobahnApiClientTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        client = new AutobahnApiClient(webClient, mapper, cacheAdapter);
+        client = new AutobahnApiClient(webClient, mapper);
     }
 
     @AfterEach
@@ -80,15 +77,6 @@ class AutobahnApiClientTest {
                 .setBody("""
                         {
                           "closure": []
-                        }
-                        """)
-                .addHeader("Content-Type", "application/json"));
-
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("""
-                        {
-                          "electric_charging_station": []
                         }
                         """)
                 .addHeader("Content-Type", "application/json"));
@@ -141,30 +129,5 @@ class AutobahnApiClientTest {
         assertTrue(result.contains(warning));
         assertTrue(result.contains(roadwork));
         assertTrue(result.contains(closure));
-    }
-
-    @Test
-    void getTrafficEventsFallback_shouldReturnCachedEvents() {
-        RoadEvent cachedEvent = new RoadEvent(
-                "cached-1",
-                "A1",
-                "Cached Event",
-                "Aus Cache geladen",
-                "",
-                RoadEventType.WARNING,
-                new Coordinate(52.1, 13.4),
-                null
-        );
-
-        when(cacheAdapter.findByRoadId("A1"))
-                .thenReturn(List.of(cachedEvent));
-
-        List<RoadEvent> result =
-                client.getTrafficEventsFallback("A1", new RuntimeException("API down"));
-
-        assertThat(result).containsExactly(cachedEvent);
-
-        verify(cacheAdapter).findByRoadId("A1");
-        verifyNoInteractions(mapper);
     }
 }

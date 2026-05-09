@@ -4,6 +4,7 @@ import de.th_ro.sqs_verkehrsapp.application.port.out.RoadEventCachePort;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,8 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
     public void save(String roadId, List<RoadEvent> events) {
         repository.deleteByRoadId(roadId);
 
+        LocalDateTime cachedAt = LocalDateTime.now();
+
         List<CachedRoadEventEntity> entities = events.stream()
                 .map(event -> new CachedRoadEventEntity(
                         event.roadId(),
@@ -33,7 +36,7 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
                         event.type().name(),
                         event.coordinate().latitude(),
                         event.coordinate().longitude(),
-                        LocalDateTime.now()
+                        cachedAt
                 ))
                 .toList();
 
@@ -41,9 +44,20 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
     }
 
     @Override
-    public List<RoadEvent> findByRoadId(String roadId) {
-        return repository.findByRoadId(roadId)
-                .stream()
+    public TrafficEventsResult findByRoadId(String roadId) {
+        List<CachedRoadEventEntity> entities = repository.findByRoadId(roadId);
+
+        if (entities.isEmpty()) {
+            return new TrafficEventsResult(
+                    List.of(),
+                    false,
+                    null
+            );
+        }
+
+        LocalDateTime cachedAt = entities.get(0).getCachedAt();
+
+        List<RoadEvent> events = entities.stream()
                 .map(entity -> new RoadEvent(
                         entity.getEventId(),
                         entity.getRoadId(),
@@ -55,5 +69,11 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
                         null
                 ))
                 .toList();
+
+        return new TrafficEventsResult(
+                events,
+                false,
+                cachedAt
+        );
     }
 }

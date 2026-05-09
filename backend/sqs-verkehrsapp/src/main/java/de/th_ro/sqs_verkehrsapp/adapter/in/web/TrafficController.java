@@ -1,9 +1,10 @@
 package de.th_ro.sqs_verkehrsapp.adapter.in.web;
 
+import de.th_ro.sqs_verkehrsapp.adapter.in.web.dto.TrafficResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.in.web.dto.TrafficResponseDto;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
-import de.th_ro.sqs_verkehrsapp.application.service.TrafficService;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
+import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +23,21 @@ public class TrafficController {
     }
 
     @GetMapping("/{roadId}")
-    public List<TrafficResponseDto> getTrafficEvents(@PathVariable String roadId) {
-        return trafficQueryUseCase.getTrafficEvents(roadId)
+    public TrafficResponse getTrafficEvents(@PathVariable String roadId) {
+
+        TrafficEventsResult result =
+                trafficQueryUseCase.getTrafficEvents(roadId);
+
+        List<TrafficResponseDto> events = result.events()
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
+
+        return new TrafficResponse(
+                result.live(),
+                result.cachedAt(),
+                events
+        );
     }
 
     private TrafficResponseDto toResponseDto(RoadEvent event) {
