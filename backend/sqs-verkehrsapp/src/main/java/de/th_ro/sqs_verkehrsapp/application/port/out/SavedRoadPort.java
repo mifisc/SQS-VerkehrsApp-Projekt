@@ -5,7 +5,7 @@ import de.th_ro.sqs_verkehrsapp.domain.model.SavedRoad;
 import java.util.List;
 import java.util.UUID;
 
-public interface SavedRoadRepositoryPort {
+public interface SavedRoadPort {
 
     SavedRoad save(SavedRoad savedRoad);
 

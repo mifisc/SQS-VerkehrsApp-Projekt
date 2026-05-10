@@ -1,11 +1,11 @@
-package de.th_ro.sqs_verkehrsapp.domain.port.out;
+package de.th_ro.sqs_verkehrsapp.application.port.out;
 
 import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepositoryPort {
+public interface UserPort {
 
     AppUser save(AppUser user);
 

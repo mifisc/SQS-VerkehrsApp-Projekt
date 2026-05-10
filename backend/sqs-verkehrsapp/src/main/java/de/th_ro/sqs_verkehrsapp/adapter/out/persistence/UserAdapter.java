@@ -2,8 +2,8 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.persistence;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.UserEntity;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.UserRepository;
+import de.th_ro.sqs_verkehrsapp.application.port.out.UserPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
-import de.th_ro.sqs_verkehrsapp.domain.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class UserAdapter implements UserRepositoryPort {
+public class UserAdapter implements UserPort {
 
     private final UserRepository repository;
 

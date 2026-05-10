@@ -2,7 +2,7 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.persistence;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.SavedRoadEntity;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.SavedRoadRepository;
-import de.th_ro.sqs_verkehrsapp.application.port.out.SavedRoadRepositoryPort;
+import de.th_ro.sqs_verkehrsapp.application.port.out.SavedRoadPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.SavedRoad;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class SavedRoadAdapter implements SavedRoadRepositoryPort {
+public class SavedRoadAdapter implements SavedRoadPort {
 
     private final SavedRoadRepository repository;
 
