@@ -32,9 +32,9 @@ public class TrafficControllerIntegrationTest {
     @Test
     void shouldReturnTrafficEvents() throws Exception {
         List<RoadEvent> events = List.of(
-                event("w1", RoadEventType.WARNING, RiskLevel.MEDIUM),
-                event("r1", RoadEventType.ROADWORK, RiskLevel.MEDIUM),
-                event("c1", RoadEventType.CLOSURE, RiskLevel.HIGH));
+                event("w1", "A1", RoadEventType.WARNING, RiskLevel.MEDIUM),
+                event("r1", "A1", RoadEventType.ROADWORK, RiskLevel.LOW),
+                event("c1", "A1", RoadEventType.CLOSURE, RiskLevel.HIGH));
 
         TrafficEventsResult result = new TrafficEventsResult(
                 events,
@@ -56,10 +56,40 @@ public class TrafficControllerIntegrationTest {
                 .andExpect(jsonPath("$.events[2].id").value("c1"));
     }
 
-    private RoadEvent event(String id, RoadEventType type, RiskLevel riskLevel) {
+    @Test
+    void shouldReturnAllTrafficEvents() throws Exception {
+        List<RoadEvent> events = List.of(
+                event("w1", "A1", RoadEventType.WARNING, RiskLevel.MEDIUM),
+                event("r1", "A3", RoadEventType.ROADWORK, RiskLevel.LOW),
+                event("c1", "A8", RoadEventType.CLOSURE, RiskLevel.HIGH)
+        );
+
+        TrafficEventsResult result = new TrafficEventsResult(
+                events,
+                true,
+                LocalDateTime.of(2026, 5, 9, 15, 0)
+        );
+
+        when(trafficQueryUseCase.getAllTrafficEvents())
+                .thenReturn(result);
+
+        mockMvc.perform(get("/api/traffic"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.live").value(true))
+                .andExpect(jsonPath("$.cachedAt").value("2026-05-09T15:00:00"))
+                .andExpect(jsonPath("$.events.length()").value(3))
+                .andExpect(jsonPath("$.events[0].id").value("w1"))
+                .andExpect(jsonPath("$.events[0].roadId").value("A1"))
+                .andExpect(jsonPath("$.events[1].id").value("r1"))
+                .andExpect(jsonPath("$.events[1].roadId").value("A3"))
+                .andExpect(jsonPath("$.events[2].id").value("c1"))
+                .andExpect(jsonPath("$.events[2].roadId").value("A8"));
+    }
+
+    private RoadEvent event(String id, String roadId, RoadEventType type, RiskLevel riskLevel) {
         return new RoadEvent(
                 id,
-                "A1",
+                roadId,
                 "Title " + id,
                 "Subtitle " + id,
                 "Description " + id,

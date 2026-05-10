@@ -103,4 +103,102 @@ class TrafficControllerTest {
                 ))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
+
+    @Test
+    void shouldReturnAllTrafficEvents() throws Exception {
+        RoadEvent eventA1 = new RoadEvent(
+                "id-1",
+                "A1",
+                "Title A1",
+                "Subtitle A1",
+                "Description A1",
+                RoadEventType.WARNING,
+                new Coordinate(50.123, 8.456),
+                RiskLevel.MEDIUM
+        );
+
+        RoadEvent eventA8 = new RoadEvent(
+                "id-2",
+                "A8",
+                "Title A8",
+                "Subtitle A8",
+                "Description A8",
+                RoadEventType.CLOSURE,
+                new Coordinate(51.123, 9.456),
+                RiskLevel.HIGH
+        );
+
+        TrafficEventsResult result = new TrafficEventsResult(
+                List.of(eventA1, eventA8),
+                true,
+                LocalDateTime.of(2026, 5, 9, 15, 0)
+        );
+
+        when(trafficQueryUseCase.getAllTrafficEvents())
+                .thenReturn(result);
+
+        mockMvc.perform(get("/api/traffic"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(jsonPath("$.live").value(true))
+                .andExpect(jsonPath("$.cachedAt").value("2026-05-09T15:00:00"))
+                .andExpect(jsonPath("$.events.length()").value(2))
+
+                .andExpect(jsonPath("$.events[0].id").value("id-1"))
+                .andExpect(jsonPath("$.events[0].roadId").value("A1"))
+                .andExpect(jsonPath("$.events[0].title").value("Title A1"))
+                .andExpect(jsonPath("$.events[0].type").value("WARNING"))
+                .andExpect(jsonPath("$.events[0].latitude").value(50.123))
+                .andExpect(jsonPath("$.events[0].longitude").value(8.456))
+                .andExpect(jsonPath("$.events[0].riskLevel").value("MEDIUM"))
+
+                .andExpect(jsonPath("$.events[1].id").value("id-2"))
+                .andExpect(jsonPath("$.events[1].roadId").value("A8"))
+                .andExpect(jsonPath("$.events[1].title").value("Title A8"))
+                .andExpect(jsonPath("$.events[1].type").value("CLOSURE"))
+                .andExpect(jsonPath("$.events[1].latitude").value(51.123))
+                .andExpect(jsonPath("$.events[1].longitude").value(9.456))
+                .andExpect(jsonPath("$.events[1].riskLevel").value("HIGH"));
+
+        verify(trafficQueryUseCase).getAllTrafficEvents();
+    }
+
+    @Test
+    void shouldReturnEmptyArrayWhenNoTrafficEventsExistForAllRoads() throws Exception {
+        TrafficEventsResult result = new TrafficEventsResult(
+                List.of(),
+                false,
+                null
+        );
+
+        when(trafficQueryUseCase.getAllTrafficEvents())
+                .thenReturn(result);
+
+        mockMvc.perform(get("/api/traffic"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.live").value(false))
+                .andExpect(jsonPath("$.cachedAt").doesNotExist())
+                .andExpect(jsonPath("$.events.length()").value(0));
+
+        verify(trafficQueryUseCase).getAllTrafficEvents();
+    }
+
+    @Test
+    void shouldReturn503WhenAllTrafficDataUnavailable() throws Exception {
+        when(trafficQueryUseCase.getAllTrafficEvents())
+                .thenThrow(new TrafficDataUnavailableException(
+                        "Autobahn API nicht verfügbar. Autobahnen konnten nicht geladen werden.",
+                        new RuntimeException()
+                ));
+
+        mockMvc.perform(get("/api/traffic"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("TRAFFIC_DATA_UNAVAILABLE"))
+                .andExpect(jsonPath("$.message").value(
+                        "Autobahn API nicht verfügbar. Autobahnen konnten nicht geladen werden."
+                ))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(trafficQueryUseCase).getAllTrafficEvents();
+    }
 }
