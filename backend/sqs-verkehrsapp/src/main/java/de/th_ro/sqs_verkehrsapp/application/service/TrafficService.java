@@ -3,12 +3,8 @@ package de.th_ro.sqs_verkehrsapp.application.service;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class TrafficService implements TrafficQueryUseCase {
@@ -38,15 +34,15 @@ public class TrafficService implements TrafficQueryUseCase {
     @Override
     public TrafficEventsResult getAllTrafficEvents() {
 
-        List<String> roadIds = autobahnApiPort.getAvailableRoadIds();
+        TrafficEventsResult result = autobahnApiPort.getAllTrafficEvents();
 
-        List<RoadEvent> events = roadIds.stream()
-                .flatMap(roadId -> autobahnApiPort.getTrafficEvents(roadId).events().stream())
-                .toList();
+        int riskScore = riskScoreCalculator.calculateRiskScore(result.events());
 
-
-        int riskScore = riskScoreCalculator.calculateRiskScore(events);
-
-        return new TrafficEventsResult(events, true, LocalDateTime.now(), riskScore);
+        return new TrafficEventsResult(
+                result.events(),
+                result.live(),
+                result.cachedAt(),
+                riskScore
+        );
     }
 }
