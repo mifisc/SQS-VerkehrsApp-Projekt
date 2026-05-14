@@ -104,4 +104,30 @@ class ResilientAutobahnApiAdapterTest {
                 )
         );
     }
+
+    @Test
+    void getAvailableRoadIds_shouldReturnRoadIdsFromClient() {
+        when(autobahnApiClient.getAvailableRoadIds())
+                .thenReturn(List.of("A1", "A3", "A8"));
+
+        List<String> result = adapter.getAvailableRoadIds();
+
+        assertThat(result).containsExactly("A1", "A3", "A8");
+
+        verify(autobahnApiClient).getAvailableRoadIds();
+        verifyNoInteractions(cachePort);
+    }
+
+    @Test
+    void getAvailableRoadIdsFallback_shouldThrowTrafficDataUnavailableException() {
+        TrafficDataUnavailableException exception = assertThrows(
+                TrafficDataUnavailableException.class,
+                () -> adapter.getAvailableRoadIdsFallback(
+                        new RuntimeException("API down")
+                )
+        );
+
+        assertThat(exception.getMessage())
+                .contains("Autobahn API nicht verfügbar");
+    }
 }

@@ -40,6 +40,24 @@ public class TrafficController {
         );
     }
 
+    @GetMapping
+    public TrafficResponse getAllTrafficEvents() {
+
+        TrafficEventsResult result =
+                trafficQueryUseCase.getAllTrafficEvents();
+
+        List<TrafficResponseDto> events = result.events()
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+
+        return new TrafficResponse(
+                result.live(),
+                result.cachedAt(),
+                events
+        );
+    }
+
     private TrafficResponseDto toResponseDto(RoadEvent event) {
         return new TrafficResponseDto(
                 event.id(),

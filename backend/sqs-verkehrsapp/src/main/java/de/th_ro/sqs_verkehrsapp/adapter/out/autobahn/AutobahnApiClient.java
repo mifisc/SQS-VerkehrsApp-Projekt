@@ -1,5 +1,6 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.AutobahnRoadsResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
@@ -67,5 +68,27 @@ public class AutobahnApiClient {
                 .bodyToMono(ClosureResponse.class)
                 .block();
         return mapper.mapClosures(roadId, closureResponse);
+    }
+
+    public List<String> getAvailableRoadIds() {
+        try {
+            AutobahnRoadsResponse response = webClient.get()
+                    .uri("/")
+                    .retrieve()
+                    .bodyToMono(AutobahnRoadsResponse.class)
+                    .block();
+
+            if (response == null || response.roads() == null) {
+                return List.of();
+            }
+
+            return response.roads();
+
+        } catch (WebClientException | IllegalStateException exception) {
+            throw new ExternalTrafficApiException(
+                    "Fehler beim Abrufen der verfügbaren Autobahnen",
+                    exception
+            );
+        }
     }
 }

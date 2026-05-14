@@ -43,6 +43,13 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
         );
     }
 
+    @Override
+    @Retry(name = "autobahnApi", fallbackMethod = "getAvailableRoadIdsFallback")
+    @CircuitBreaker(name = "autobahnApi", fallbackMethod = "getAvailableRoadIdsFallback")
+    public List<String> getAvailableRoadIds() {
+        return autobahnApiClient.getAvailableRoadIds();
+    }
+
     public TrafficEventsResult getTrafficEventsFallback(String roadId, Throwable throwable) {
         TrafficEventsResult cachedResult = cachePort.findByRoadId(roadId);
 
@@ -56,6 +63,13 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
 
         throw new TrafficDataUnavailableException(
                 "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für " + roadId,
+                throwable
+        );
+    }
+
+    public List<String> getAvailableRoadIdsFallback(Throwable throwable) {
+        throw new TrafficDataUnavailableException(
+                "Autobahn API nicht verfügbar. Autobahnen konnten nicht geladen werden.",
                 throwable
         );
     }

@@ -143,6 +143,35 @@ public class AutobahnApiClientIntegrationTest {
         assertTrue(exception.getMessage().contains("A8"));
     }
 
+    @Test
+    void getAvailableRoadIds_shouldCallRootEndpointAndReturnRoadIds() throws Exception {
+        mockWebServer.enqueue(jsonResponse("""
+            {
+              "roads": ["A1", "A3", "A8"]
+            }
+            """));
+
+        List<String> result = client.getAvailableRoadIds();
+
+        assertThat(result).containsExactly("A1", "A3", "A8");
+
+        assertThat(mockWebServer.takeRequest().getPath())
+                .isEqualTo("/");
+    }
+
+    @Test
+    void getAvailableRoadIds_shouldThrowExternalTrafficApiExceptionWhenApiReturnsServerError() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        ExternalTrafficApiException exception = assertThrows(
+                ExternalTrafficApiException.class,
+                () -> client.getAvailableRoadIds()
+        );
+
+        assertThat(exception.getMessage())
+                .contains("Autobahnen");
+    }
+
     private MockResponse jsonResponse(String body) {
         return new MockResponse()
                 .setResponseCode(200)
