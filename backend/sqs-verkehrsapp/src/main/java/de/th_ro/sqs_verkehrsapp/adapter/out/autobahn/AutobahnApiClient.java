@@ -3,42 +3,42 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.RoadEventCacheAdapter;
-import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
+import de.th_ro.sqs_verkehrsapp.domain.exception.ExternalTrafficApiException;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class AutobahnApiClient implements AutobahnApiPort {
+public class AutobahnApiClient {
 
     private final WebClient webClient;
     private final AutobahnApiMapper mapper;
-    private final RoadEventCacheAdapter cacheAdapter;
 
-    public AutobahnApiClient(WebClient webClient, AutobahnApiMapper mapper, RoadEventCacheAdapter cacheAdapter) {
+    public AutobahnApiClient(WebClient webClient, AutobahnApiMapper mapper) {
         this.webClient = webClient;
         this.mapper = mapper;
-        this.cacheAdapter = cacheAdapter;
-    }
-
-
-    @Override
-    public List<RoadEvent> getTrafficEvents(String roadId) {
-        return fetchTrafficEvents(roadId);
     }
 
     public List<RoadEvent> fetchTrafficEvents(String roadId) {
-        List<RoadEvent> events = new ArrayList<>();
+        try {
+            List<RoadEvent> events = new ArrayList<>();
 
-        events.addAll(fetchWarnings(roadId));
-        events.addAll(fetchRoadworks(roadId));
-        events.addAll(fetchClosures(roadId));
-        return events;
+            events.addAll(fetchWarnings(roadId));
+            events.addAll(fetchRoadworks(roadId));
+            events.addAll(fetchClosures(roadId));
+            return events;
+
+        } catch (WebClientException | IllegalStateException exception) {
+            throw new ExternalTrafficApiException(
+                    "Fehler beim Abrufen der Autobahn-API für " + roadId,
+                    exception
+            );
+        }
     }
-
 
     public List<RoadEvent> fetchRoadworks(String roadId) {
         RoadworksResponse roadworksResponse = webClient.get()

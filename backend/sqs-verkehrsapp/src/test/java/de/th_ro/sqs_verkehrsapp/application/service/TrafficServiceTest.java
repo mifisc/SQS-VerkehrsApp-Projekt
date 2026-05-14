@@ -1,20 +1,19 @@
 package de.th_ro.sqs_verkehrsapp.application.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
-import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
-import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import java.util.List;
+import de.th_ro.sqs_verkehrsapp.domain.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrafficServiceTest {
@@ -36,13 +35,21 @@ class TrafficServiceTest {
                 roadwork,
                 closure);
 
+        TrafficEventsResult expectedResult = new TrafficEventsResult(
+                expectedEvents,
+                true,
+                LocalDateTime.of(2026, 5, 9, 14, 30)
+        );
+
         when(autobahnApiPort.getTrafficEvents(roadId))
-                .thenReturn(expectedEvents);
+                .thenReturn(expectedResult);
 
-        List<RoadEvent> result = trafficService.getTrafficEvents(roadId);
+        TrafficEventsResult result = trafficService.getTrafficEvents(roadId);
 
-        assertThat(result).containsExactlyElementsOf(expectedEvents);
-
+        assertThat(result.events()).containsExactlyElementsOf(expectedEvents);
+        assertThat(result.live()).isTrue();
+        assertThat(result.cachedAt())
+                .isEqualTo(LocalDateTime.of(2026, 5, 9, 14, 30));
         verify(autobahnApiPort).getTrafficEvents(roadId);
     }
 
@@ -50,12 +57,20 @@ class TrafficServiceTest {
     void shouldReturnEmptyListWhenNoEventsExist() {
         String roadId = "A2";
 
+        TrafficEventsResult emptyResult = new TrafficEventsResult(
+                List.of(),
+                false,
+                null
+        );
+
         when(autobahnApiPort.getTrafficEvents(roadId))
-                .thenReturn(List.of());
+                .thenReturn(emptyResult);
 
-        List<RoadEvent> result = trafficService.getTrafficEvents(roadId);
+        TrafficEventsResult result = trafficService.getTrafficEvents(roadId);
 
-        assertThat(result).isEmpty();
+        assertThat(result.events()).isEmpty();
+        assertThat(result.live()).isFalse();
+        assertThat(result.cachedAt()).isNull();
 
         verify(autobahnApiPort).getTrafficEvents(roadId);
     }

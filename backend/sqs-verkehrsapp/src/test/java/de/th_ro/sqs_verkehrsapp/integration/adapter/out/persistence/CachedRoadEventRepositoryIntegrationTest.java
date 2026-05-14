@@ -1,16 +1,15 @@
-package de.th_ro.sqs_verkehrsapp.integration;
-
-import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.CachedRoadEventEntity;
-import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.CachedRoadEventRepository;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-
-import java.time.LocalDateTime;
-import java.util.List;
+package de.th_ro.sqs_verkehrsapp.integration.adapter.out.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.CachedRoadEventEntity;
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.CachedRoadEventRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 @DataJpaTest
 public class CachedRoadEventRepositoryIntegrationTest {

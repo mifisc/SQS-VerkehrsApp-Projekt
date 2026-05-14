@@ -1,26 +1,23 @@
 package de.th_ro.sqs_verkehrsapp.adapter.in.web;
 
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
-import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
-import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import de.th_ro.sqs_verkehrsapp.domain.exception.TrafficDataUnavailableException;
+import de.th_ro.sqs_verkehrsapp.domain.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TrafficController.class)
+@WebMvcTest({TrafficController.class, GlobalExceptionHandler.class})
 class TrafficControllerTest {
 
     @Autowired
@@ -42,33 +39,68 @@ class TrafficControllerTest {
                 RiskLevel.MEDIUM
         );
 
+        TrafficEventsResult result = new TrafficEventsResult(
+                List.of(event),
+                true,
+                LocalDateTime.of(2026, 5, 9, 14, 30)
+        );
+
+
         when(trafficQueryUseCase.getTrafficEvents("A1"))
-                .thenReturn(List.of(event));
+                .thenReturn(result);
 
         mockMvc.perform(get("/api/traffic/A1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value("id-1"))
-                .andExpect(jsonPath("$[0].roadId").value("A1"))
-                .andExpect(jsonPath("$[0].title").value("Title"))
-                .andExpect(jsonPath("$[0].subtitle").value("Subtitle"))
-                .andExpect(jsonPath("$[0].description").value("Description"))
-                .andExpect(jsonPath("$[0].type").value("WARNING"))
-                .andExpect(jsonPath("$[0].latitude").value(50.123))
-                .andExpect(jsonPath("$[0].longitude").value(8.456))
-                .andExpect(jsonPath("$[0].riskLevel").value("MEDIUM"));
+                .andExpect(jsonPath("$.events.length()").value(1))
+                .andExpect(jsonPath("$.live").value(true))
+                .andExpect(jsonPath("$.cachedAt").value("2026-05-09T14:30:00"))
+                .andExpect(jsonPath("$.events.length()").value(1))
+                .andExpect(jsonPath("$.events[0].id").value("id-1"))
+                .andExpect(jsonPath("$.events[0].roadId").value("A1"))
+                .andExpect(jsonPath("$.events[0].title").value("Title"))
+                .andExpect(jsonPath("$.events[0].subtitle").value("Subtitle"))
+                .andExpect(jsonPath("$.events[0].description").value("Description"))
+                .andExpect(jsonPath("$.events[0].type").value("WARNING"))
+                .andExpect(jsonPath("$.events[0].latitude").value(50.123))
+                .andExpect(jsonPath("$.events[0].longitude").value(8.456))
+                .andExpect(jsonPath("$.events[0].riskLevel").value("MEDIUM"));
 
         verify(trafficQueryUseCase).getTrafficEvents("A1");
     }
 
     @Test
     void shouldReturnEmptyArrayWhenNoTrafficEventsExist() throws Exception {
+        TrafficEventsResult result = new TrafficEventsResult(
+                List.of(),
+                false,
+                null
+        );
+
         when(trafficQueryUseCase.getTrafficEvents("A2"))
-                .thenReturn(List.of());
+                .thenReturn(result);
 
         mockMvc.perform(get("/api/traffic/A2"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(jsonPath("$.live").value(false))
+                .andExpect(jsonPath("$.cachedAt").doesNotExist())
+                .andExpect(jsonPath("$.events.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn503WhenTrafficDataUnavailable() throws Exception {
+        when(trafficQueryUseCase.getTrafficEvents("A8"))
+                .thenThrow(new TrafficDataUnavailableException(
+                        "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für A8",
+                        new RuntimeException()
+                ));
+
+        mockMvc.perform(get("/api/traffic/A8"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("TRAFFIC_DATA_UNAVAILABLE"))
+                .andExpect(jsonPath("$.message").value(
+                        "Autobahn API nicht verfügbar und keine Cache-Daten vorhanden für A8"
+                ))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }

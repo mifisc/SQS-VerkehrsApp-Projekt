@@ -3,6 +3,7 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.persistence;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
+import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -67,6 +68,7 @@ class RoadEventCacheAdapterTest {
 
     @Test
     void findByRoadId_shouldMapEntitiesToRoadEvents() {
+        LocalDateTime cachedAt = LocalDateTime.of(2026, 5, 9, 14, 30);
         CachedRoadEventEntity entity = new CachedRoadEventEntity(
                 "A1",
                 "event-1",
@@ -75,16 +77,18 @@ class RoadEventCacheAdapterTest {
                 "ROADWORK",
                 52.1,
                 13.4,
-                LocalDateTime.now()
+                cachedAt
         );
 
         when(repository.findByRoadId("A1")).thenReturn(List.of(entity));
 
-        List<RoadEvent> result = adapter.findByRoadId("A1");
+        TrafficEventsResult result = adapter.findByRoadId("A1");
 
-        assertEquals(1, result.size());
+        assertFalse(result.live());
+        assertEquals(cachedAt, result.cachedAt());
+        assertEquals(1, result.events().size());
 
-        RoadEvent event = result.get(0);
+        RoadEvent event = result.events().get(0);
 
         assertEquals("event-1", event.id());
         assertEquals("A1", event.roadId());
@@ -93,5 +97,16 @@ class RoadEventCacheAdapterTest {
         assertEquals(RoadEventType.ROADWORK, event.type());
         assertEquals(52.1, event.coordinate().latitude());
         assertEquals(13.4, event.coordinate().longitude());
+    }
+
+    @Test
+    void findByRoadId_shouldReturnEmptyResultWhenNoCachedEventsExist() {
+        when(repository.findByRoadId("A2")).thenReturn(List.of());
+
+        TrafficEventsResult result = adapter.findByRoadId("A2");
+
+        assertFalse(result.live());
+        assertNull(result.cachedAt());
+        assertTrue(result.events().isEmpty());
     }
 }
