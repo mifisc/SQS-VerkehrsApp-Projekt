@@ -1,5 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.persistence;
 
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.CachedRoadEventEntity;
+import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.CachedRoadEventRepository;
 import de.th_ro.sqs_verkehrsapp.application.port.out.RoadEventCachePort;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
@@ -13,6 +15,9 @@ import java.util.List;
 
 @Component
 public class RoadEventCacheAdapter implements RoadEventCachePort {
+
+    private static final String ALL_ROADS_CACHE_KEY = "ALL";
+    private static final String AVAILABLE_ROADS_CACHE_KEY = "AVAILABLE_ROADS";
 
     private final CachedRoadEventRepository repository;
 
@@ -29,7 +34,7 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
 
         List<CachedRoadEventEntity> entities = events.stream()
                 .map(event -> new CachedRoadEventEntity(
-                        event.roadId(),
+                        roadId,
                         event.id(),
                         event.title(),
                         event.subtitle(),
@@ -51,7 +56,8 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
             return new TrafficEventsResult(
                     List.of(),
                     false,
-                    null
+                    null,
+                    0
             );
         }
 
@@ -73,7 +79,8 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
         return new TrafficEventsResult(
                 events,
                 false,
-                cachedAt
+                cachedAt,
+                0
         );
     }
 }
