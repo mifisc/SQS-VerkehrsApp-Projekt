@@ -1,12 +1,12 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.*;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.*;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
 import de.th_ro.sqs_verkehrsapp.domain.model.RiskLevel;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;

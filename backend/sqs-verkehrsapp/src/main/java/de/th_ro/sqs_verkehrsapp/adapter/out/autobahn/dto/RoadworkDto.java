@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto;
 
 import lombok.Getter;
 import lombok.Setter;

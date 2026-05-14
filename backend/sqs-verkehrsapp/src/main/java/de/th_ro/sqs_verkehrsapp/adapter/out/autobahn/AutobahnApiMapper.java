@@ -1,10 +1,10 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.BaseAutobahnDto;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.CoordinateDto;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.ClosureResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.RoadworksResponse;
-import de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto.wrapper.WarningResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.BaseAutobahnDto;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.CoordinateDto;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.ClosureResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksResponse;
+import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;

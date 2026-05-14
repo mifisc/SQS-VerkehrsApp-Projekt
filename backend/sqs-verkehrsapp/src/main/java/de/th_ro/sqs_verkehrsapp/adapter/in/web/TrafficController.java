@@ -2,6 +2,7 @@ package de.th_ro.sqs_verkehrsapp.adapter.in.web;
 
 import de.th_ro.sqs_verkehrsapp.adapter.in.web.dto.TrafficResponseDto;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
+import de.th_ro.sqs_verkehrsapp.application.service.TrafficService;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

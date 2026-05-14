@@ -3,9 +3,9 @@ package de.th_ro.sqs_verkehrsapp.application.service;
 import de.th_ro.sqs_verkehrsapp.application.port.in.TrafficQueryUseCase;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TrafficService implements TrafficQueryUseCase {
@@ -18,12 +18,6 @@ public class TrafficService implements TrafficQueryUseCase {
 
     @Override
     public List<RoadEvent> getTrafficEvents(String roadId) {
-        List<RoadEvent> events = new ArrayList<>();
-
-        events.addAll(autobahnApiPort.getWarnings(roadId));
-        events.addAll(autobahnApiPort.getRoadworks(roadId));
-        events.addAll(autobahnApiPort.getClosures(roadId));
-
-        return events;
+        return autobahnApiPort.getTrafficEvents(roadId);
     }
 }

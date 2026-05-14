@@ -1,4 +1,4 @@
-package de.th_ro.sqs_verkehrsapp.adapter.out.autobahnapi.dto;
+package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
