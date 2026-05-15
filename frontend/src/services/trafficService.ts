@@ -44,7 +44,7 @@ export async function saveFavourite(token: string, roadId: string): Promise<void
     body: JSON.stringify({ roadId }),
   });
   if (!response.ok) {
-    throw new Error('Favourit konnte nicht gespeichert werden');
+    throw new Error('Favorit konnte nicht gespeichert werden');
   }
 }
 
