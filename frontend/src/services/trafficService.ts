@@ -54,6 +54,6 @@ export async function deleteFavourite(token: string, roadId: string): Promise<vo
     headers: { 'Authorization': `Bearer ${token}` },
   });
   if (!response.ok) {
-    throw new Error('Favourit konnte nicht entfernt werden');
+    throw new Error('Favorit konnte nicht entfernt werden');
   }
 }
