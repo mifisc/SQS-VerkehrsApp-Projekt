@@ -30,7 +30,7 @@ export function Dashboard({ token }: DashboardProps) {
       <div className="section-title">Meine Favouriten</div>
       {savedRoads.length === 0 && (
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-          Keine gespeicherten Autobahnen. Wähle eine Autobahn aus und speichere sie als Favourit.
+          Keine gespeicherten Autobahnen. Wähle eine Autobahn aus und speichere sie als Favorit.
         </p>
       )}
       <div className="dashboard-grid">
