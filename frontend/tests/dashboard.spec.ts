@@ -85,7 +85,7 @@ test('Gespeicherte Autobahnen werden im Dashboard angezeigt', async ({ page }) =
   await expect(page.getByTestId('dashboard-road-A92')).toBeVisible();
 });
 
-test('Nutzer kann Favourit aus Dashboard löschen', async ({ page }) => {
+test('Nutzer kann Favorit aus Dashboard löschen', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('login-button').click();
   await page.getByTestId('username-input').fill('testuser');
