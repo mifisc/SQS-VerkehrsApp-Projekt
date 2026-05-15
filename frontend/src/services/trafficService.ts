@@ -21,3 +21,39 @@ export async function fetchTrafficEvents(roadId?: string): Promise<TrafficEvent[
   const data = await response.json();
   return data.events ?? [];
 }
+
+export async function login(username: string, password: string): Promise<{ token: string; username: string }> {
+  const response = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!response.ok) {
+    throw new Error('Login fehlgeschlagen');
+  }
+  return response.json();
+}
+
+export async function saveFavourite(token: string, roadId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/saved-roads`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ roadId }),
+  });
+  if (!response.ok) {
+    throw new Error('Favorit konnte nicht gespeichert werden');
+  }
+}
+
+export async function deleteFavourite(token: string, roadId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/saved-roads/${roadId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    throw new Error('Favorit konnte nicht entfernt werden');
+  }
+}
