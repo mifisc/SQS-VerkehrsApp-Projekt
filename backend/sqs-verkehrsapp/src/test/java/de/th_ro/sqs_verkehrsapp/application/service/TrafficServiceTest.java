@@ -79,6 +79,39 @@ class TrafficServiceTest {
         verify(autobahnApiPort).getTrafficEvents(roadId);
     }
 
+    @Test
+    void shouldReturnAllTrafficEventsWithRiskScore() {
+        RoadEvent warning = event("1", "A1", RoadEventType.WARNING);
+        RoadEvent roadwork = event("2", "A3", RoadEventType.ROADWORK);
+        RoadEvent closure = event("3", "A8", RoadEventType.CLOSURE);
+
+        List<RoadEvent> events = List.of(
+                warning,
+                roadwork,
+                closure
+        );
+
+        TrafficEventsResult apiResult = new TrafficEventsResult(
+                events,
+                true,
+                LocalDateTime.of(2026, 5, 9, 14, 30),
+                0
+        );
+
+        when(autobahnApiPort.getAllTrafficEvents())
+                .thenReturn(apiResult);
+
+        TrafficEventsResult result = trafficService.getAllTrafficEvents();
+
+        assertThat(result.events()).containsExactlyElementsOf(events);
+        assertThat(result.live()).isTrue();
+        assertThat(result.cachedAt())
+                .isEqualTo(LocalDateTime.of(2026, 5, 9, 14, 30));
+        assertThat(result.riskScore()).isEqualTo(57);
+
+        verify(autobahnApiPort).getAllTrafficEvents();
+    }
+
     private RoadEvent event(String id, String roadId, RoadEventType type) {
         return new RoadEvent(
                 id,

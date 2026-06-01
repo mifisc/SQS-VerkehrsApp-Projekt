@@ -16,6 +16,9 @@ import java.util.List;
 @Component
 public class RoadEventCacheAdapter implements RoadEventCachePort {
 
+    private static final String ALL_ROADS_CACHE_KEY = "ALL";
+    private static final String AVAILABLE_ROADS_CACHE_KEY = "AVAILABLE_ROADS";
+
     private final CachedRoadEventRepository repository;
 
     public RoadEventCacheAdapter(CachedRoadEventRepository repository) {
@@ -31,7 +34,7 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
 
         List<CachedRoadEventEntity> entities = events.stream()
                 .map(event -> new CachedRoadEventEntity(
-                        event.roadId(),
+                        roadId,
                         event.id(),
                         event.title(),
                         event.subtitle(),

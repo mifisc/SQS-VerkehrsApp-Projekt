@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface AutobahnApiPort {
     TrafficEventsResult getTrafficEvents(String roadId);
+    TrafficEventsResult getAllTrafficEvents();
     List<String> getAvailableRoadIds();
 }

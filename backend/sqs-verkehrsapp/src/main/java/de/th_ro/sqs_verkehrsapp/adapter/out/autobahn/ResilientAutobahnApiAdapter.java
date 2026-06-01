@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.autobahn;
 
 import de.th_ro.sqs_verkehrsapp.application.port.out.AutobahnApiPort;
+import de.th_ro.sqs_verkehrsapp.application.port.out.AvailableRoadCachePort;
 import de.th_ro.sqs_verkehrsapp.application.port.out.RoadEventCachePort;
 import de.th_ro.sqs_verkehrsapp.domain.exception.TrafficDataUnavailableException;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
@@ -19,13 +20,18 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
 
     private final AutobahnApiClient autobahnApiClient;
     private final RoadEventCachePort cachePort;
+    private final AvailableRoadCachePort availableRoadCachePort;
+
+    private static final String ALL_ROADS_CACHE_KEY = "ALL";
 
     public ResilientAutobahnApiAdapter(
             AutobahnApiClient autobahnApiClient,
-            RoadEventCachePort cachePort
+            RoadEventCachePort cachePort,
+            AvailableRoadCachePort availableRoadCachePort
     ) {
         this.autobahnApiClient = autobahnApiClient;
         this.cachePort = cachePort;
+        this.availableRoadCachePort = availableRoadCachePort;
     }
 
     @Override
@@ -48,7 +54,33 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
     @Retry(name = "autobahnApi", fallbackMethod = "getAvailableRoadIdsFallback")
     @CircuitBreaker(name = "autobahnApi", fallbackMethod = "getAvailableRoadIdsFallback")
     public List<String> getAvailableRoadIds() {
-        return autobahnApiClient.getAvailableRoadIds();
+        List<String> roadIds = autobahnApiClient.getAvailableRoadIds();
+
+        if (roadIds != null && !roadIds.isEmpty()) {
+            availableRoadCachePort.saveAll(roadIds);
+        }
+
+        return roadIds;
+    }
+
+    @Override
+    @Retry(name = "autobahnApi", fallbackMethod = "getAllTrafficEventsFallback")
+    @CircuitBreaker(name = "autobahnApi", fallbackMethod = "getAllTrafficEventsFallback")
+    public TrafficEventsResult getAllTrafficEvents() {
+        List<String> roadIds = getAvailableRoadIds();
+
+        List<RoadEvent> events = roadIds.stream()
+                .flatMap(roadId -> getTrafficEvents(roadId).events().stream())
+                .toList();
+
+        cachePort.save(ALL_ROADS_CACHE_KEY, events);
+
+        return new TrafficEventsResult(
+                events,
+                true,
+                LocalDateTime.now(),
+                0
+        );
     }
 
     public TrafficEventsResult getTrafficEventsFallback(String roadId, Throwable throwable) {
@@ -69,9 +101,33 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
         );
     }
 
-    public List<String> getAvailableRoadIdsFallback(Throwable throwable) {
+    public TrafficEventsResult getAllTrafficEventsFallback(Throwable throwable) {
+        TrafficEventsResult cachedResult = cachePort.findByRoadId(ALL_ROADS_CACHE_KEY);
+
+        if (cachedResult != null && cachedResult.events() != null && !cachedResult.events().isEmpty()) {
+            return new TrafficEventsResult(
+                    cachedResult.events(),
+                    false,
+                    cachedResult.cachedAt(),
+                    0
+            );
+        }
+
         throw new TrafficDataUnavailableException(
-                "Autobahn API nicht verfügbar. Autobahnen konnten nicht geladen werden.",
+                "Autobahn API nicht verfügbar und keine Cache-Daten für alle Verkehrsmeldungen vorhanden.",
+                throwable
+        );
+    }
+
+    public List<String> getAvailableRoadIdsFallback(Throwable throwable) {
+        List<String> cachedRoadIds = availableRoadCachePort.findAll();
+
+        if (cachedRoadIds != null && !cachedRoadIds.isEmpty()) {
+            return cachedRoadIds;
+        }
+
+        throw new TrafficDataUnavailableException(
+                "Autobahn API nicht verfügbar und keine gecachten Autobahnen vorhanden.",
                 throwable
         );
     }
