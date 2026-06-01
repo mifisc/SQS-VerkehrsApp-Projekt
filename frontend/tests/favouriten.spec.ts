@@ -67,7 +67,7 @@ test('Autobahn kann als Favourit gespeichert werden', async ({ page }) => {
   await page.getByTestId('username-input').fill('testuser');
   await page.getByTestId('password-input').fill('password');
   await page.getByTestId('submit-login').click();
-  await page.getByTestId('autobahn-selector').selectOption('A1');
+  // A1 ist standardmäßig vorausgewählt
   await page.getByTestId('save-favourite-button').click();
   await expect(page.getByTestId('favourite-saved-message')).toBeVisible();
 });

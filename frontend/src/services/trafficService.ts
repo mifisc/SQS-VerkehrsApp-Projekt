@@ -12,14 +12,24 @@ export async function fetchAvailableRoads(): Promise<string[]> {
   return roads.sort();
 }
 
-export async function fetchTrafficEvents(roadId?: string): Promise<TrafficEvent[]> {
+export interface TrafficResult {
+  events: TrafficEvent[];
+  live: boolean;
+  cachedAt: string | null;
+}
+
+export async function fetchTrafficEvents(roadId?: string): Promise<TrafficResult> {
   const url = roadId ? `${API_BASE}/traffic/${roadId}` : `${API_BASE}/traffic`;
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Fehler beim Laden der Ereignisse: ${response.status}`);
   }
   const data = await response.json();
-  return data.events ?? [];
+  return {
+    events: data.events ?? [],
+    live: data.live ?? false,
+    cachedAt: data.cachedAt ?? null,
+  };
 }
 
 export async function login(username: string, password: string): Promise<{ token: string; username: string }> {
