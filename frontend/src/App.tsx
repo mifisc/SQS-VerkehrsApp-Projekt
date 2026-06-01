@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { AutobahnSelector } from './components/AutobahnSelector';
-import { IncidentMap, type TrafficEvent } from './components/IncidentMap';
-import { RiskBadge } from './components/RiskBadge';
-import { Dashboard } from './components/Dashboard';
-import { fetchTrafficEvents, login, saveFavourite } from './services/trafficService';
+import {useEffect, useState} from 'react';
+import {AutobahnSelector} from './components/AutobahnSelector';
+import {IncidentMap, type TrafficEvent} from './components/IncidentMap';
+import {RiskBadge} from './components/RiskBadge';
+import {Dashboard} from './components/Dashboard';
+import type {TrafficResult} from './services/trafficService';
+import {fetchTrafficEvents, login, saveFavourite} from './services/trafficService';
 
 function App() {
-  const [allEvents, setAllEvents] = useState<TrafficEvent[]>([]);
   const [events, setEvents] = useState<TrafficEvent[]>([]);
   const [isLive, setIsLive] = useState(false);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
@@ -20,7 +20,6 @@ function App() {
 
   useEffect(() => {
     fetchTrafficEvents().then((result) => {
-      setAllEvents(result.events);
       setIsLive(result.live);
       setCachedAt(result.cachedAt);
       // Дефолтний вибір: перші 3 доступні автобани
@@ -31,12 +30,27 @@ function App() {
     }).catch(console.error);
   }, []);
 
-  function handleRoadSelect(roadIds: string[]) {
+  async function handleRoadSelect(roadIds: string[]) {
     setSelectedRoads(roadIds);
+
     if (roadIds.length === 0) {
-      setEvents(allEvents);
-    } else {
-      setEvents(allEvents.filter((e) => roadIds.includes(e.roadId)));
+      const result = await fetchTrafficEvents();
+      setEvents(result.events);
+      return;
+    }
+
+    try {
+      const results = await Promise.all(
+          roadIds.map((roadId) => fetchTrafficEvents(roadId))
+      );
+
+      const mergedEvents: TrafficEvent[] = results.flatMap(
+          (result: TrafficResult) => result.events
+      );
+
+      setEvents(mergedEvents);
+    } catch (error) {
+      console.error(error);
     }
   }
 

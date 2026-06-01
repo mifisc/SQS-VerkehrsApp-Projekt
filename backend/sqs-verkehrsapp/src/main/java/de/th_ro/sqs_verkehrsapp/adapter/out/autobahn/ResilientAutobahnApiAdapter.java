@@ -69,14 +69,21 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
     public TrafficEventsResult getAllTrafficEvents() {
         List<String> roadIds = getAvailableRoadIds();
 
-        List<RoadEvent> events = roadIds.stream()
-                .flatMap(roadId -> getTrafficEvents(roadId).events().stream())
+        List<RoadEvent> allEvents = roadIds.stream()
+                .flatMap(roadId -> {
+                    List<RoadEvent> events =
+                            autobahnApiClient.fetchTrafficEvents(roadId);
+
+                    cachePort.save(roadId, events);
+
+                    return events.stream();
+                })
                 .toList();
 
-        cachePort.save(ALL_ROADS_CACHE_KEY, events);
+        cachePort.save(ALL_ROADS_CACHE_KEY, allEvents);
 
         return new TrafficEventsResult(
-                events,
+                allEvents,
                 true,
                 LocalDateTime.now(),
                 0

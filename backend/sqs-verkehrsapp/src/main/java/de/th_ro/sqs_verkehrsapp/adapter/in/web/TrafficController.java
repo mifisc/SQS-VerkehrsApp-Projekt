@@ -22,6 +22,11 @@ public class TrafficController {
         this.trafficQueryUseCase = trafficQueryUseCase;
     }
 
+    @GetMapping("/roads")
+    public List<String> getAvailableRoadIds() {
+        return trafficQueryUseCase.getAvailableRoadIds();
+    }
+
     @GetMapping("/{roadId}")
     public TrafficResponse getTrafficEvents(@PathVariable String roadId) {
 
