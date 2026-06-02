@@ -32,15 +32,10 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Java JaCoCo to Teamscale
+      - name: Java JaCoCo Coverage upload to Teamscale
         working-directory: backend/sqs-verkehrsapp
         run: |
-          ./mvnw -B clean \
-            org.jacoco:jacoco-maven-plugin:prepare-agent \
-            com.teamscale:teamscale-maven-plugin:prepare-tia-unit-test \
-            test \
-            org.jacoco:jacoco-maven-plugin:report \
-            com.teamscale:teamscale-maven-plugin:testwise-coverage-report \
+          ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
             -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
             -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
@@ -49,6 +44,9 @@ jobs:
             -DaccessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
             -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
             -DclassDirectories=target/classes \
+            -DcoverageFormats=JACOCO \
+            -DcoverageFiles=target/site/jacoco/jacoco.xml \
+            -Dpartition="GitHub Actions JaCoCo" \
             -Drevision=${{ github.sha }}
 
       - name: Frontend build with coverage
