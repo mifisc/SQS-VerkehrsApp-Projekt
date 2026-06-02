@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
       react(),
       istanbul({
-        include: 'src/*',
+        include: 'src/**/*',
         extension: ['.ts', '.tsx'],
         requireEnv: false
       })],
