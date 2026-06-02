@@ -57,7 +57,7 @@ jobs:
             -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
             -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
             -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
-            -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }}
+            -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }} \
             -DclassDirectories=target/classes \
             -DcoverageFormats=JACOCO \
             -DcoverageFiles=target/site/jacoco/jacoco.xml \
