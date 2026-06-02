@@ -35,7 +35,9 @@ jobs:
       - name: Java Testwise Coverage upload to Teamscale
         working-directory: backend/sqs-verkehrsapp
         run: |
-          ./mvnw -B clean test \
+          ./mvnw -B clean \
+            com.teamscale:teamscale-maven-plugin:prepare-tia-unit-test \
+            test \
             com.teamscale:teamscale-maven-plugin:prepare-tia-unit-test \
             com.teamscale:teamscale-maven-plugin:testwise-coverage-report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
