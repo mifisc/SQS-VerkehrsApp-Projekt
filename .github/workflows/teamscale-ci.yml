@@ -43,6 +43,10 @@ jobs:
           test -n "${{ secrets.TEAMSCALE_ACCESSKEY }}" || (echo "TEAMSCALE_ACCESSKEY is missing" && exit 1)
           test -n "${{ secrets.TEAMSCALE_BACKEND }}" || (echo "TEAMSCALE_BACKEND is missing" && exit 1)
 
+      - name: Debug revision
+        run: |
+          echo "REVISION=${{ github.sha }}"
+
       - name: Java JaCoCo Coverage upload to Teamscale
         working-directory: backend/sqs-verkehrsapp
         run: |
