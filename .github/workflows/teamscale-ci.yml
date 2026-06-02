@@ -38,12 +38,12 @@ jobs:
           ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
             -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
+            -Dteamscale.url=${{ secrets.TEAMSCALE_SERVER }} \
             -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
             -Dusername=${{ secrets.TEAMSCALE_USER }} \
             -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
             -DaccessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
             -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
-            -DclassDirectories=target/classes \
             -DcoverageFormats=JACOCO \
             -DcoverageFiles=target/site/jacoco/jacoco.xml \
             -Dpartition="GitHub Actions JaCoCo" \
