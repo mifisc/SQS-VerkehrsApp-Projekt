@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-import { fetchAvailableRoads } from '../services/trafficService';
+import {useEffect, useRef, useState} from 'react';
+import {fetchAvailableRoads} from '../services/trafficService';
 
 interface AutobahnSelectorProps {
   onSelect: (roadIds: string[]) => void;
@@ -19,12 +19,6 @@ export function AutobahnSelector({ onSelect, max = 5, defaultSelected = [] }: Au
       .then(setRoads)
       .catch(() => setError('Autobahnen konnten nicht geladen werden.'));
   }, []);
-
-  useEffect(() => {
-    if (defaultSelected.length > 0 && selected.length === 0) {
-      setSelected(defaultSelected);
-    }
-  }, [defaultSelected]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
