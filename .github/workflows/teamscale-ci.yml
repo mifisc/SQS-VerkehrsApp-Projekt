@@ -37,16 +37,19 @@ jobs:
         run: |
           ./mvnw -B clean \
             org.jacoco:jacoco-maven-plugin:prepare-agent \
+            com.teamscale:teamscale-maven-plugin:prepare-tia-unit-test \
             test \
             org.jacoco:jacoco-maven-plugin:report \
+            com.teamscale:teamscale-maven-plugin:testwise-coverage-report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
             -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
             -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
             -Dusername=${{ secrets.TEAMSCALE_USER }} \
+            -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
             -DaccessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
+            -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
             -DclassDirectories=target/classes \
-            -Drevision=${{ github.sha }} \
-            -DrunAllTests=true
+            -Drevision=${{ github.sha }}
 
       - name: Frontend build with coverage
         working-directory: frontend
