@@ -11,6 +11,10 @@ permissions:
   contents: read
   pull-requests: read
 
+env:
+  TEAMSCALE_SERVER: ${{ secrets.TEAMSCALE_SERVER }}
+  TEAMSCALE_BACKEND: ${{ secrets.TEAMSCALE_BACKEND }}
+
 jobs:
   teamscale:
     runs-on: ubuntu-latest
@@ -45,16 +49,14 @@ jobs:
           ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
             -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
-            -Dteamscale.url=${{ secrets.TEAMSCALE_SERVER }} \
             -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
-            -Dusername=${{ secrets.TEAMSCALE_USER }} \
             -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
-            -DaccessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
             -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
+            -Dteamscale.revision=${{ github.sha }} \
+            -DclassDirectories=target/classes \
             -DcoverageFormats=JACOCO \
             -DcoverageFiles=target/site/jacoco/jacoco.xml \
-            -Dpartition="GitHub Actions JaCoCo" \
-            -Drevision=${{ github.sha }}
+            -Dpartition="GitHub Actions JaCoCo"
 
       - name: Frontend build with coverage
         working-directory: frontend

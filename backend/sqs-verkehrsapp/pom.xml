@@ -259,6 +259,10 @@
 				<groupId>com.teamscale</groupId>
 				<artifactId>teamscale-maven-plugin</artifactId>
 				<version>36.5.2</version>
+				<configuration>
+					<teamscaleUrl>${env.TEAMSCALE_SERVER}</teamscaleUrl>
+					<projectId>${env.TEAMSCALE_BACKEND}</projectId>
+				</configuration>
 			</plugin>
         </plugins>
     </build>
