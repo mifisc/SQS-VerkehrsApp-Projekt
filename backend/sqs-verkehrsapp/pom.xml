@@ -99,6 +99,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>com.teamscale</groupId>
+			<artifactId>teamscale-maven-plugin</artifactId>
+			<version>36.5.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
