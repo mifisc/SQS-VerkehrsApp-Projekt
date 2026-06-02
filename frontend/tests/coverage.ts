@@ -5,8 +5,8 @@ import fs from 'fs';
 import path from 'path';
 
 export const test = base.extend({
-    page: async ({ page }, use) => {
-        await use(page);
+    page: async ({ page }, runTest) => {
+        await runTest(page);
 
         const coverage = await page.evaluate(() => (window as { __coverage__?: unknown }).__coverage__);
 
