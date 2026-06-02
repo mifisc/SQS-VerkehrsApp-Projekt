@@ -35,13 +35,15 @@ jobs:
       - name: Java Testwise Coverage upload to Teamscale
         working-directory: backend/sqs-verkehrsapp
         run: |
-          ./mvnw -B clean verify \
+          ./mvnw -B clean test \
+            com.teamscale:teamscale-maven-plugin:prepare-tia-unit-test \
             com.teamscale:teamscale-maven-plugin:testwise-coverage-report \
             com.teamscale:teamscale-maven-plugin:upload-coverage \
-            -Dteamscale.url=${{ secrets.TEAMSCALE_SERVER }} \
-            -Dteamscale.project=${{ secrets.TEAMSCALE_BACKEND }} \
-            -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
-            -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }}
+            -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
+            -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
+            -Dusername=${{ secrets.TEAMSCALE_USER }} \
+            -DaccessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
+            -DclassDirectories=target/classes
 
       - name: Frontend build with coverage
         working-directory: frontend
