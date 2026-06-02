@@ -1,13 +1,36 @@
 import {useEffect, useRef, useState} from 'react';
 import {fetchAvailableRoads} from '../services/trafficService';
 
+/**
+ * Eigenschaften für den AutobahnSelector.
+ */
 interface AutobahnSelectorProps {
+
+  /**
+   * Aktuell ausgewählte Autobahnen.
+   */
   selected: string[];
+
+  /**
+   * Callback zum Aktualisieren der Auswahl.
+   */
   onSelect: (roadIds: string[]) => void;
+
+  /**
+   * Maximale Anzahl auswählbarer Autobahnen.
+   * Standardwert: 5.
+   */
   max?: number;
 }
 
-export function AutobahnSelector({ selected, onSelect, max = 5 }: AutobahnSelectorProps) {
+/**
+ * Dropdown-Komponente zur Auswahl mehrerer Autobahnen.
+ */
+export function AutobahnSelector({
+                                   selected,
+                                   onSelect,
+                                   max = 5,
+                                 }: AutobahnSelectorProps) {
   const [roads, setRoads] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
