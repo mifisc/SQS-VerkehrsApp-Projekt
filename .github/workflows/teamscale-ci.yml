@@ -32,6 +32,13 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Check Teamscale secrets
+        run: |
+          test -n "${{ secrets.TEAMSCALE_SERVER }}" || (echo "TEAMSCALE_SERVER is missing" && exit 1)
+          test -n "${{ secrets.TEAMSCALE_USER }}" || (echo "TEAMSCALE_USER is missing" && exit 1)
+          test -n "${{ secrets.TEAMSCALE_ACCESSKEY }}" || (echo "TEAMSCALE_ACCESSKEY is missing" && exit 1)
+          test -n "${{ secrets.TEAMSCALE_BACKEND }}" || (echo "TEAMSCALE_BACKEND is missing" && exit 1)
+
       - name: Java JaCoCo Coverage upload to Teamscale
         working-directory: backend/sqs-verkehrsapp
         run: |
