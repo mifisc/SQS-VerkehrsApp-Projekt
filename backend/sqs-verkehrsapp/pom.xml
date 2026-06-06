@@ -262,8 +262,6 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>prepare-tia-unit-test</goal>
-							<goal>prepare-tia-integration-test</goal>
 							<goal>testwise-coverage-report</goal>
 							<goal>upload-coverage</goal>
 						</goals>
@@ -282,7 +280,7 @@
 					<integrationTestPartition>Integration Tests</integrationTestPartition>
 
 					<includes>
-						<include>*de.th_ro.sqs_verkehrsapp.*</include>
+						<include>de.th_ro.sqs_verkehrsapp.*</include>
 					</includes>
 				</configuration>
             </plugin>
