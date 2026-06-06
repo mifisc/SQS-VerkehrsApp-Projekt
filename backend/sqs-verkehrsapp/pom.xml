@@ -322,6 +322,7 @@
 									<goal>prepare-tia-unit-test</goal>
 									<goal>prepare-tia-integration-test</goal>
 									<goal>testwise-coverage-report</goal>
+									<goal>upload-coverage</goal>
 								</goals>
 							</execution>
 						</executions>

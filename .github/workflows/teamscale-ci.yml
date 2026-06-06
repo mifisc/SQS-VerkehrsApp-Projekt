@@ -69,25 +69,10 @@ jobs:
           project: ${{ secrets.TEAMSCALE_BACKEND }}
           user: ${{ secrets.TEAMSCALE_USER }}
           accesskey: ${{ secrets.TEAMSCALE_ACCESSKEY }}
-          partition: GitHub Actions JaCoCo
+          partition: Unit Tests
           format: JACOCO
           revision: ${{ env.TEAMSCALE_REVISION }}
           files: backend/sqs-verkehrsapp/target/site/jacoco/jacoco.xml
-
-#      - name: Java JaCoCo Coverage upload to Teamscale
-#        working-directory: backend/sqs-verkehrsapp
-#        run: |
-#          ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
-#            com.teamscale:teamscale-maven-plugin:upload-coverage \
-#            -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
-#            -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
-#            -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
-#            -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
-#            -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }} \
-#            -DclassDirectories=target/classes \
-#            -DcoverageFormats=JACOCO \
-#            -DcoverageFiles=target/site/jacoco/jacoco.xml \
-#            -Dpartition="GitHub Actions JaCoCo"
 
       - name: Frontend build with coverage
         working-directory: frontend
