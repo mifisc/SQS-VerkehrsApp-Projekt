@@ -48,20 +48,29 @@ jobs:
         run: |
           echo "REVISION=${{ github.sha }}"
 
-      - name: Java JaCoCo Coverage upload to Teamscale
+      - name: Run tests with Teamscale Testwise Coverage
         working-directory: backend/sqs-verkehrsapp
-        run: |
-          ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
-            com.teamscale:teamscale-maven-plugin:upload-coverage \
-            -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
-            -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
-            -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
-            -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
-            -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }} \
-            -DclassDirectories=target/classes \
-            -DcoverageFormats=JACOCO \
-            -DcoverageFiles=target/site/jacoco/jacoco.xml \
-            -Dpartition="GitHub Actions JaCoCo"
+        env:
+          TEAMSCALE_URL: ${{ secrets.TEAMSCALE_SERVER  }}
+          TEAMSCALE_PROJECT: ${{ secrets.TEAMSCALE_BACKEND }}
+          TEAMSCALE_USER: ${{ secrets.TEAMSCALE_USER }}
+          TEAMSCALE_ACCESSKEY: ${{ secrets.TEAMSCALE_ACCESSKEY }}
+        run: ./mvnw -B clean verify -Dtia
+
+#      - name: Java JaCoCo Coverage upload to Teamscale
+#        working-directory: backend/sqs-verkehrsapp
+#        run: |
+#          ./mvnw -B clean test org.jacoco:jacoco-maven-plugin:report \
+#            com.teamscale:teamscale-maven-plugin:upload-coverage \
+#            -DteamscaleUrl=${{ secrets.TEAMSCALE_SERVER }} \
+#            -DprojectId=${{ secrets.TEAMSCALE_BACKEND }} \
+#            -Dteamscale.username=${{ secrets.TEAMSCALE_USER }} \
+#            -Dteamscale.accessToken=${{ secrets.TEAMSCALE_ACCESSKEY }} \
+#            -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }} \
+#            -DclassDirectories=target/classes \
+#            -DcoverageFormats=JACOCO \
+#            -DcoverageFiles=target/site/jacoco/jacoco.xml \
+#            -Dpartition="GitHub Actions JaCoCo"
 
       - name: Frontend build with coverage
         working-directory: frontend
@@ -85,11 +94,3 @@ jobs:
           revision: ${{ env.TEAMSCALE_REVISION }}
           files: frontend/coverage/lcov.info
 
-      - name: Run tests with Teamscale Testwise Coverage
-        working-directory: backend/sqs-verkehrsapp
-        env:
-          TEAMSCALE_URL: ${{ secrets.TEAMSCALE_SERVER  }}
-          TEAMSCALE_PROJECT: ${{ secrets.TEAMSCALE_BACKEND }}
-          TEAMSCALE_USER: ${{ secrets.TEAMSCALE_USER }}
-          TEAMSCALE_ACCESS_TOKEN: ${{ secrets.TEAMSCALE_ACCESSKEY }}
-        run: ./mvnw -B clean verify -Dtia
