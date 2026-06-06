@@ -55,7 +55,7 @@ jobs:
           TEAMSCALE_PROJECT: ${{ secrets.TEAMSCALE_BACKEND }}
           TEAMSCALE_USER: ${{ secrets.TEAMSCALE_USER }}
           TEAMSCALE_ACCESSKEY: ${{ secrets.TEAMSCALE_ACCESSKEY }}
-        run: ./mvnw -B clean verify -Dtia
+        run: ./mvnw -B clean verify -Dtia -Dteamscale.revision=${{ env.TEAMSCALE_REVISION }}
 
 #      - name: Java JaCoCo Coverage upload to Teamscale
 #        working-directory: backend/sqs-verkehrsapp
