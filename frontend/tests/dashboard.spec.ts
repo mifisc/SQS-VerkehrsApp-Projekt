@@ -34,7 +34,10 @@ const mockLoginResponse = {
   username: 'testuser',
 };
 
-const mockSavedRoads = ['A3', 'A92'];
+const mockSavedRoads = [
+  { id: '1', userId: '1', roadId: 'A3' },
+  { id: '2', userId: '1', roadId: 'A92' },
+];
 
 test.beforeEach(async ({ page }) => {
   await page.route('/api/traffic', async (route) => {
