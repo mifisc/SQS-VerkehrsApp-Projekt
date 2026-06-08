@@ -16,7 +16,7 @@ function App() {
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showLogin, setShowLogin] = useState(false);
-  const [savedMessage, setSavedMessage] = useState(false);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -53,17 +53,26 @@ function App() {
       alert('Login fehlgeschlagen');
     }
   }
-
   async function handleSaveFavourite() {
     if (!token || selectedRoads.length === 0) return;
-    try {
-      await Promise.all(selectedRoads.map((road) => saveFavourite(token, road)));
-      setSavedMessage(true);
-      setRefreshKey((prev) => prev + 1);
-      setTimeout(() => setSavedMessage(false), 3000);
-    } catch {
-      alert('Fehler beim Speichern');
+
+    const results = await Promise.allSettled(
+      selectedRoads.map((road) => saveFavourite(token, road))
+    );
+
+    const saved = results.filter((r) => r.status === 'fulfilled').length;
+    const alreadyExisted = results.length - saved;
+
+    if (saved > 0 && alreadyExisted === 0) {
+      setSavedMessage('Favouriten gespeichert!');
+    } else if (saved > 0 && alreadyExisted > 0) {
+      setSavedMessage(`${saved} gespeichert, ${alreadyExisted} bereits vorhanden.`);
+    } else {
+      setSavedMessage('Alle Autobahnen sind bereits in deinen Favouriten.');
     }
+
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setSavedMessage(null), 4000);
   }
 
   function formatCachedAt(iso: string | null) {
@@ -186,8 +195,12 @@ function App() {
             </button>
           )}
           {savedMessage && (
-            <div className="banner-success" data-testid="favourite-saved-message" style={{ marginTop: '10px' }}>
-              <i className="ti ti-check" aria-hidden="true"></i> Favourit gespeichert!
+            <div
+              className={savedMessage.includes('bereits') ? 'banner-warning' : 'banner-success'}
+              data-testid="favourite-saved-message"
+              style={{ marginTop: '10px' }}
+            >
+              <i className={`ti ${savedMessage.includes('bereits') ? 'ti-info-circle' : 'ti-check'}`} aria-hidden="true"></i> {savedMessage}
             </div>
           )}
         </div>

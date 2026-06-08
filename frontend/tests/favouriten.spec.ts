@@ -99,3 +99,22 @@ test('Gespeicherter Favourit wird im Dashboard angezeigt', async ({ page }) => {
   await expect(page.getByTestId('favourite-saved-message')).toBeVisible();
   await expect(page.getByTestId('dashboard-road-A1')).toBeVisible();
 });
+
+test('Hinweis wenn alle Autobahnen bereits gespeichert sind', async ({ page }) => {
+  await page.route('/api/saved-roads', async (route) => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({ status: 403, json: {} });
+    } else {
+      await route.fulfill({ json: [] });
+    }
+  });
+
+  await page.goto('/');
+  await page.getByTestId('login-button').click();
+  await page.getByTestId('username-input').fill('testuser');
+  await page.getByTestId('password-input').fill('password');
+  await page.getByTestId('submit-login').click();
+  await page.getByTestId('save-favourite-button').click();
+  await expect(page.getByTestId('favourite-saved-message')).toBeVisible();
+  await expect(page.getByTestId('favourite-saved-message')).toContainText('bereits');
+});
