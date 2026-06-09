@@ -14,9 +14,15 @@ interface DashboardProps {
 }
 
 function getMaxRiskLevel(events: DashboardRoadData['events']): RiskLevel | 'NONE' {
-  if (events.length === 0) { return 'LOW'; }
-  if (events.some((e) => e.riskLevel === 'HIGH')) { return 'HIGH'; }
-  if (events.some((e) => e.riskLevel === 'MEDIUM')) { return 'MEDIUM'; }
+  if (events.length === 0) {
+    return 'LOW'; 
+  }
+  if (events.some((e) => e.riskLevel === 'HIGH')) { 
+    return 'HIGH'; 
+  }
+  if (events.some((e) => e.riskLevel === 'MEDIUM')) { 
+    return 'MEDIUM'; 
+  }
   return 'LOW';
 }
 
