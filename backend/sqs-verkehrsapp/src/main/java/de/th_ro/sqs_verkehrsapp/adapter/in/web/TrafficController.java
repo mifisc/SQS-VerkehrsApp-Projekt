@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * REST controller providing traffic information for roads.
+ * Supports retrieving traffic events for a specific road or for all roads.
+ */
 @RestController
 @RequestMapping("/api/traffic")
 public class TrafficController {
@@ -22,6 +26,12 @@ public class TrafficController {
         this.trafficQueryUseCase = trafficQueryUseCase;
     }
 
+    /**
+     * Retrieves traffic events for the specified road.
+     *
+     * @param roadId the identifier of the road
+     * @return traffic information including events, risk score, and cache status
+     */
     @GetMapping("/{roadId}")
     public TrafficResponse getTrafficEvents(@PathVariable String roadId) {
 
@@ -41,6 +51,11 @@ public class TrafficController {
         );
     }
 
+    /**
+     * Retrieves traffic events for all available roads.
+     *
+     * @return traffic information including events, risk score, and cache status
+     */
     @GetMapping
     public TrafficResponse getAllTrafficEvents() {
 
@@ -60,6 +75,12 @@ public class TrafficController {
         );
     }
 
+    /**
+     * Converts a domain traffic event into a response DTO.
+     *
+     * @param event the domain traffic event
+     * @return the corresponding response DTO
+     */
     private TrafficResponseDto toResponseDto(RoadEvent event) {
         return new TrafficResponseDto(
                 event.id(),
