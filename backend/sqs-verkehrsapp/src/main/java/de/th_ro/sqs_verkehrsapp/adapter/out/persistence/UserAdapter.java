@@ -4,13 +4,17 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.UserEntity;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.UserRepository;
 import de.th_ro.sqs_verkehrsapp.application.port.out.UserPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.UUID;
-
-
+/**
+ * Persistence-Adapter für Anwendungsbenutzer.
+ * <p>
+ * Implementiert {@link UserPort} mittels Spring Data JPA und übernimmt
+ * das Mapping zwischen Domain-Modellen und Persistenz-Entitäten.
+ */
 @Component
 @RequiredArgsConstructor
 public class UserAdapter implements UserPort {
@@ -46,6 +50,12 @@ public class UserAdapter implements UserPort {
         return repository.existsByUsername(username);
     }
 
+    /**
+     * Wandelt eine Benutzer-Entität in das entsprechende Domain-Modell um.
+     *
+     * @param entity Persistenz-Entität
+     * @return Domain-Modell
+     */
     private AppUser mapToDomain(UserEntity entity) {
         return AppUser.builder()
                 .id(entity.getId())

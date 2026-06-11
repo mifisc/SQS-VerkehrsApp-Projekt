@@ -8,23 +8,38 @@ import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
+/**
+ * Persistence-Adapter für den Cache von Verkehrsereignissen.
+ * <p>
+ * Implementiert {@link RoadEventCachePort} und speichert bzw. lädt
+ * Verkehrsereignisse aus der Datenbank. Die Domain-Objekte werden dabei
+ * in Persistenz-Entitäten umgewandelt und umgekehrt.
+ */
 @Component
 public class RoadEventCacheAdapter implements RoadEventCachePort {
 
-    private static final String ALL_ROADS_CACHE_KEY = "ALL";
-    private static final String AVAILABLE_ROADS_CACHE_KEY = "AVAILABLE_ROADS";
-
     private final CachedRoadEventRepository repository;
 
+    /**
+     * Erstellt einen neuen Adapter für den Zugriff auf den Ereignis-Cache.
+     *
+     * @param repository Repository für zwischengespeicherte Verkehrsereignisse
+     */
     public RoadEventCacheAdapter(CachedRoadEventRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Speichert die Verkehrsereignisse einer Autobahn im Cache.
+     * Bereits vorhandene Cache-Einträge für die Autobahn werden zuvor entfernt.
+     *
+     * @param roadId Kennung der Autobahn
+     * @param events zu speichernde Verkehrsereignisse
+     */
     @Override
     @Transactional
     public void save(String roadId, List<RoadEvent> events) {
@@ -48,6 +63,13 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
         repository.saveAll(entities);
     }
 
+    /**
+     * Lädt die zwischengespeicherten Verkehrsereignisse einer Autobahn.
+     *
+     * @param roadId Kennung der Autobahn
+     * @return das Ergebnisobjekt mit den geladenen Ereignissen und
+     *         den zugehörigen Cache-Informationen
+     */
     @Override
     public TrafficEventsResult findByRoadId(String roadId) {
         List<CachedRoadEventEntity> entities = repository.findByRoadId(roadId);

@@ -5,10 +5,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.*;
 
-import java.util.UUID;
-
+/**
+ * JPA-Entität zur Persistierung von Anwendungsbenutzern.
+ * <p>
+ * Die Entität speichert die für die Authentifizierung erforderlichen
+ * Benutzerdaten. Passwörter werden ausschließlich als Hashwert
+ * gespeichert und niemals im Klartext abgelegt.
+ */
 @Entity
 @Table(name = "app_users")
 @Getter

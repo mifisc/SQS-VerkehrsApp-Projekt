@@ -4,13 +4,17 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.SavedRoadEntity;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.SavedRoadRepository;
 import de.th_ro.sqs_verkehrsapp.application.port.out.SavedRoadPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.SavedRoad;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.UUID;
-
-
+/**
+ * Persistence-Adapter für gespeicherte Autobahnen eines Benutzers.
+ * <p>
+ * Implementiert {@link SavedRoadPort} und übernimmt die Persistierung
+ * sowie das Mapping zwischen Domain-Modellen und JPA-Entitäten.
+ */
 @Component
 @RequiredArgsConstructor
 public class SavedRoadAdapter implements SavedRoadPort {
@@ -47,6 +51,12 @@ public class SavedRoadAdapter implements SavedRoadPort {
         repository.deleteByUserIdAndRoadId(userId, roadId);
     }
 
+    /**
+     * Wandelt eine Persistenz-Entität in das zugehörige Domain-Modell um.
+     *
+     * @param entity Persistenz-Entität
+     * @return Domain-Modell
+     */
     private SavedRoad mapToDomain(SavedRoadEntity entity) {
         return SavedRoad.builder()
                 .id(entity.getId())

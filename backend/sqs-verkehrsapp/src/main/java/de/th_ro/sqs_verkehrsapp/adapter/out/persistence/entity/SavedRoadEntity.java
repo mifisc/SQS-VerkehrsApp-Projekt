@@ -2,10 +2,16 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity;
 
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 
-import java.util.UUID;
-
+/**
+ * JPA-Entität für vom Benutzer gespeicherte Autobahnen.
+ * <p>
+ * Jede Instanz verknüpft einen Benutzer mit einer Autobahn, die er
+ * als Favorit gespeichert hat. Durch den Unique Constraint kann eine
+ * Autobahn pro Benutzer nur einmal gespeichert werden.
+ */
 @Entity
 @Table(
         name = "saved_roads",
