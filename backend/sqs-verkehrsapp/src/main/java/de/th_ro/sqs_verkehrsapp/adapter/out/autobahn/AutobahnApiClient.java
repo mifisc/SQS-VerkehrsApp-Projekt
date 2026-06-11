@@ -6,28 +6,23 @@ import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.RoadworksRespon
 import de.th_ro.sqs_verkehrsapp.adapter.out.autobahn.dto.wrapper.WarningResponse;
 import de.th_ro.sqs_verkehrsapp.domain.exception.ExternalTrafficApiException;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Client responsible for communication with the Autobahn API.
  * Retrieves warnings, roadworks, closures and available road IDs.
  */
 @Component
+@RequiredArgsConstructor
 public class AutobahnApiClient {
 
     private final WebClient webClient;
     private final AutobahnApiMapper mapper;
-
-    public AutobahnApiClient(WebClient webClient, AutobahnApiMapper mapper) {
-        this.webClient = webClient;
-        this.mapper = mapper;
-    }
-
     /**
      * Retrieves all traffic events for the given road.
      *

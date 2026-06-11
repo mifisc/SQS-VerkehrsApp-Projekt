@@ -8,11 +8,11 @@ import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 /**
  * Resilient implementation of the Autobahn API port.
@@ -21,6 +21,7 @@ import java.util.List;
  */
 @Component
 @Primary
+@RequiredArgsConstructor
 public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
 
     private final AutobahnApiClient autobahnApiClient;
@@ -29,18 +30,6 @@ public class ResilientAutobahnApiAdapter implements AutobahnApiPort {
     private final AutobahnCacheWriter autobahnCacheWriter;
 
     private static final String ALL_ROADS_CACHE_KEY = "ALL";
-
-    public ResilientAutobahnApiAdapter(
-            AutobahnApiClient autobahnApiClient,
-            RoadEventCachePort cachePort,
-            AvailableRoadCachePort availableRoadCachePort,
-            AutobahnCacheWriter autobahnCacheWriter
-    ) {
-        this.autobahnApiClient = autobahnApiClient;
-        this.cachePort = cachePort;
-        this.availableRoadCachePort = availableRoadCachePort;
-        this.autobahnCacheWriter = autobahnCacheWriter;
-    }
 
     /**
      * Retrieves traffic events for a specific motorway.

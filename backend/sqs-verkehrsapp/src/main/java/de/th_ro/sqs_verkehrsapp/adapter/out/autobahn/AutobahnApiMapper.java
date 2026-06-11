@@ -9,22 +9,19 @@ import de.th_ro.sqs_verkehrsapp.domain.logic.RiskScoreCalculator;
 import de.th_ro.sqs_verkehrsapp.domain.model.Coordinate;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Maps Autobahn API response DTOs to domain road events.
  */
 @Component
+@RequiredArgsConstructor
 public class AutobahnApiMapper {
 
     private final RiskScoreCalculator riskScoreCalculator;
-
-    public AutobahnApiMapper(RiskScoreCalculator riskScoreCalculator) {
-        this.riskScoreCalculator = riskScoreCalculator;
-    }
 
     /**
      * Maps warning response data to warning road events.
