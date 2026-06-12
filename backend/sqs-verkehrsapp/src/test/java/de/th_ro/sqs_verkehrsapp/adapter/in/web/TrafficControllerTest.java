@@ -59,9 +59,9 @@ class TrafficControllerTest {
 
     @Test
     void shouldReturnTrafficEventsForRoadId() throws Exception {
-        RoadEvent event = createRoadEvent(
+        RoadEvent event = createWarningEvent(
                 "id-1", "A1", "Title", "Subtitle", "Description",
-                RoadEventType.WARNING, 50.123, 8.456, RiskLevel.MEDIUM
+                new Coordinate(50.123, 8.456)
         );
 
         when(trafficQueryUseCase.getTrafficEvents("A1"))
@@ -113,14 +113,13 @@ class TrafficControllerTest {
 
     @Test
     void shouldReturnAllTrafficEvents() throws Exception {
-        RoadEvent eventA1 = createRoadEvent(
-                "id-1", "A1", "Title A1", "Subtitle A1", "Description A1",
-                RoadEventType.WARNING, 50.123, 8.456, RiskLevel.MEDIUM
+        RoadEvent eventA1 = createWarningEvent(
+                "id-1", "A1", "Title A1", "Subtitle A1", "Description A1", new Coordinate(50.123, 8.456)
         );
 
-        RoadEvent eventA8 = createRoadEvent(
+        RoadEvent eventA8 = createClosure(
                 "id-2", "A8", "Title A8", "Subtitle A8", "Description A8",
-                RoadEventType.CLOSURE, 51.123, 9.456, RiskLevel.HIGH
+                new Coordinate(51.123, 9.456)
         );
 
         when(trafficQueryUseCase.getAllTrafficEvents())
@@ -176,16 +175,13 @@ class TrafficControllerTest {
         verify(trafficQueryUseCase).getAllTrafficEvents();
     }
 
-    private RoadEvent createRoadEvent(
+    private RoadEvent createWarningEvent(
             String id,
             String roadId,
             String title,
             String subtitle,
             String description,
-            RoadEventType type,
-            double latitude,
-            double longitude,
-            RiskLevel riskLevel
+            Coordinate coordinate
     ) {
         return new RoadEvent(
                 id,
@@ -193,9 +189,29 @@ class TrafficControllerTest {
                 title,
                 subtitle,
                 description,
-                type,
-                new Coordinate(latitude, longitude),
-                riskLevel
+                RoadEventType.WARNING,
+                coordinate,
+                RiskLevel.MEDIUM
+        );
+    }
+
+    private RoadEvent createClosure(
+            String id,
+            String roadId,
+            String title,
+            String subtitle,
+            String description,
+            Coordinate coordinate
+    ) {
+        return new RoadEvent(
+                id,
+                roadId,
+                title,
+                subtitle,
+                description,
+                RoadEventType.CLOSURE,
+                coordinate,
+                RiskLevel.HIGH
         );
     }
 
@@ -205,9 +221,11 @@ class TrafficControllerTest {
             String cachedAt,
             int riskScore
     ) {
-        LocalDateTime cachedAtTime = cachedAt == null
-                ? null
-                : LocalDateTime.parse(cachedAt);
+        LocalDateTime cachedAtTime = null;
+
+        if (cachedAt != null) {
+            cachedAtTime = LocalDateTime.parse(cachedAt);
+        }
 
         return new TrafficEventsResult(events, live, cachedAtTime, riskScore);
     }
