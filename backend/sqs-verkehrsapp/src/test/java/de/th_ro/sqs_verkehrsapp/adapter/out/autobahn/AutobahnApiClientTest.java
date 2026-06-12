@@ -19,8 +19,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -53,7 +53,7 @@ class AutobahnApiClientTest {
     }
 
     @Test
-    void fetchTrafficEvents_shouldFetchAndCombineAllEventTypes() {
+    void fetchTrafficEventsShouldFetchAndCombineAllEventTypes() {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setBody("""
@@ -126,8 +126,6 @@ class AutobahnApiClientTest {
         List<RoadEvent> result = client.fetchTrafficEvents("A1");
 
         assertEquals(3, result.size());
-        assertTrue(result.contains(warning));
-        assertTrue(result.contains(roadwork));
-        assertTrue(result.contains(closure));
+        assertThat(result).containsExactlyInAnyOrder(warning, roadwork, closure);
     }
 }

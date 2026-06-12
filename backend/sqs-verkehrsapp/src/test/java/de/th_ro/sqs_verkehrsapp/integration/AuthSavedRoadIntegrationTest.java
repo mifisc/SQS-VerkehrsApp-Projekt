@@ -32,19 +32,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AuthSavedRoadIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final UserRepository userRepository;
+
+    private final SavedRoadRepository savedRoadRepository;
 
     @MockitoBean
     private AutobahnApiPort autobahnApiPort;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SavedRoadRepository savedRoadRepository;
+    AuthSavedRoadIntegrationTest(MockMvc mockMvc, UserRepository userRepository, SavedRoadRepository savedRoadRepository) {
+        this.mockMvc = mockMvc;
+        this.userRepository = userRepository;
+        this.savedRoadRepository = savedRoadRepository;
+    }
 
     @BeforeEach
     void cleanDatabase() {

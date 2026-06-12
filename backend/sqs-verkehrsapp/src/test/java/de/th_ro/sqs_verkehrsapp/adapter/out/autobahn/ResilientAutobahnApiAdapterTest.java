@@ -18,7 +18,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ResilientAutobahnApiAdapterTest {
@@ -39,7 +43,7 @@ class ResilientAutobahnApiAdapterTest {
     private ResilientAutobahnApiAdapter adapter;
 
     @Test
-    void getTrafficEvents_shouldReturnLiveEventsAndSaveToCache() {
+    void getTrafficEventsShouldReturnLiveEventsAndSaveToCache() {
         RoadEvent event = new RoadEvent(
                 "id-1",
                 "A1",
@@ -65,7 +69,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getTrafficEventsFallback_shouldReturnCachedEvents() {
+    void getTrafficEventsFallbackShouldReturnCachedEvents() {
         RoadEvent cachedEvent = new RoadEvent(
                 "cached-1",
                 "A1",
@@ -116,7 +120,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAvailableRoadIds_shouldReturnRoadIdsFromClientAndSaveToCache() {
+    void getAvailableRoadIdsShouldReturnRoadIdsFromClientAndSaveToCache() {
         List<String> roadIds = List.of("A1", "A3", "A8");
 
         when(autobahnApiClient.getAvailableRoadIds())
@@ -132,7 +136,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAvailableRoadIds_shouldNotSaveEmptyRoadIdsToCache() {
+    void getAvailableRoadIdsShouldNotSaveEmptyRoadIdsToCache() {
         when(autobahnApiClient.getAvailableRoadIds())
                 .thenReturn(List.of());
 
@@ -146,7 +150,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAvailableRoadIdsFallback_shouldReturnCachedRoadIds() {
+    void getAvailableRoadIdsFallbackShouldReturnCachedRoadIds() {
         List<String> cachedRoadIds = List.of("A1", "A3", "A8");
 
         when(availableRoadCachePort.findAll())
@@ -164,7 +168,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAvailableRoadIdsFallback_shouldThrowTrafficDataUnavailableExceptionWhenCacheIsEmpty() {
+    void getAvailableRoadIdsFallbackShouldThrowTrafficDataUnavailableExceptionWhenCacheIsEmpty() {
         when(availableRoadCachePort.findAll())
                 .thenReturn(List.of());
 
@@ -182,7 +186,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAllTrafficEvents_shouldReturnLiveEventsAndSaveAllToCache() {
+    void getAllTrafficEventsShouldReturnLiveEventsAndSaveAllToCache() {
         RoadEvent eventA1 = new RoadEvent(
                 "id-1",
                 "A1",
@@ -228,7 +232,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAllTrafficEventsFallback_shouldReturnCachedAllEvents() {
+    void getAllTrafficEventsFallbackShouldReturnCachedAllEvents() {
         RoadEvent cachedEvent = new RoadEvent(
                 "cached-1",
                 "A1",
@@ -264,7 +268,7 @@ class ResilientAutobahnApiAdapterTest {
     }
 
     @Test
-    void getAllTrafficEventsFallback_shouldThrowTrafficDataUnavailableExceptionWhenCacheIsEmpty() {
+    void getAllTrafficEventsFallbackShouldThrowTrafficDataUnavailableExceptionWhenCacheIsEmpty() {
         when(cachePort.findByRoadId("ALL"))
                 .thenReturn(new TrafficEventsResult(
                         List.of(),
