@@ -85,7 +85,7 @@ class ArchitectureTest {
                     .resideInAnyPackage("..adapter..");
 
     @ArchTest
-    static final ArchRule INCOMING_ADAPTERS_SHOULD_NOT_DEPEND_ON_OUTGOING_ADAPTERSs =
+    static final ArchRule INCOMING_ADAPTERS_SHOULD_NOT_DEPEND_ON_OUTGOING_ADAPTERS =
             noClasses()
                     .that().resideInAPackage("..adapter.in..")
                     .should().dependOnClassesThat()

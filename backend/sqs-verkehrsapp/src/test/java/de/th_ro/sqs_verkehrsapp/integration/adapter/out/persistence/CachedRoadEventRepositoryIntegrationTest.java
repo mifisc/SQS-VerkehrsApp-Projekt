@@ -23,7 +23,7 @@ class CachedRoadEventRepositoryIntegrationTest {
     }
 
     @Test
-    void findByRoadId_shouldReturnOnlyEventsForGivenRoadId() {
+    void findByRoadIdShouldReturnOnlyEventsForGivenRoadId() {
 
         repository.saveAll(createTestEntities());
 
@@ -35,7 +35,7 @@ class CachedRoadEventRepositoryIntegrationTest {
     }
 
     @Test
-    void deleteByRoadId_shouldDeleteOnlyEventsForGivenRoadId() {
+    void deleteByRoadIdShouldDeleteOnlyEventsForGivenRoadId() {
         repository.saveAll(createTestEntities());
 
         repository.deleteByRoadId("A1");
