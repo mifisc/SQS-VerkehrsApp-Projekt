@@ -18,7 +18,7 @@ class SavedRoadRepositoryIntegrationTest {
     private SavedRoadRepository repository;
 
     @Test
-    public void shouldSaveAndFindRoadsByUserId() {
+    void shouldSaveAndFindRoadsByUserId() {
         UUID userId = UUID.randomUUID();
 
         repository.save(SavedRoadEntity.builder()
