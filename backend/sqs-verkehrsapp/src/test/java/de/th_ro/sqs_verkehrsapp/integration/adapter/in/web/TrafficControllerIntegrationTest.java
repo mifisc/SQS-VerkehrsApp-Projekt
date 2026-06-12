@@ -61,7 +61,7 @@ class TrafficControllerIntegrationTest {
                 57
         );
 
-        when(trafficQueryUseCase.getTrafficEvents("A1")).thenReturn(result);;
+        when(trafficQueryUseCase.getTrafficEvents("A1")).thenReturn(result);
 
         mockMvc.perform(get("/api/traffic/A1"))
                 .andExpect(status().isOk())

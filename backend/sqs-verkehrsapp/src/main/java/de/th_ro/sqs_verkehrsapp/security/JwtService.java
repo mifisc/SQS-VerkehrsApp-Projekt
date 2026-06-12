@@ -26,7 +26,7 @@ public class JwtService {
      * Secret key used to sign and verify JWT tokens.
      */
     @Value("${jwt.secret}")
-    private String SECRET;
+    private String secret;
 
     /**
      * Expiration time of a JWT token in milliseconds.
@@ -39,7 +39,7 @@ public class JwtService {
      * @return the signing key
      */
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

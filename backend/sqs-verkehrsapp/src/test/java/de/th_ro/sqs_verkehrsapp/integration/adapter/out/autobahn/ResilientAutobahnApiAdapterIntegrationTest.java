@@ -49,7 +49,7 @@ class ResilientAutobahnApiAdapterIntegrationTest {
     }
 
     @Test
-    void getTrafficEventsWhenApiFails_shouldUseFallbackFromCache() {
+    void getTrafficEventsWhenApiFailsShouldUseFallbackFromCache() {
         String roadId = "A1";
 
         RoadEvent cachedEvent = mock(RoadEvent.class);
