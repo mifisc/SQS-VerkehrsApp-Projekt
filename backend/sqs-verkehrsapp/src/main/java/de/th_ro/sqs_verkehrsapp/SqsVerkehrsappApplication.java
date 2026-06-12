@@ -16,7 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class SqsVerkehrsappApplication {
 
 	/**
-	 * Starts the Spring Boot application.
+	 * Main method that starts the Spring Boot application.
 	 *
 	 * @param args command-line arguments
 	 */

@@ -4,11 +4,12 @@ import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
-import javax.crypto.SecretKey;
-import org.springframework.stereotype.Component;
 
 /**
  * Service for creating and validating JSON Web Tokens (JWT).
@@ -26,7 +27,7 @@ public class JwtService {
             "CHANGE_THIS_SECRET_KEY_TO_A_LONG_SECURE_VALUE_123456789";
 
     /**
-     * Token validity period in milliseconds.
+     * Expiration time of a JWT token in milliseconds.
      */
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 

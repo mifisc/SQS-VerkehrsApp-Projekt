@@ -8,9 +8,10 @@ import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEventType;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 /**
  * Persistence adapter for the traffic event cache.
@@ -34,7 +35,7 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
     }
 
     /**
-     * Stores the traffic events of a motorway in the cache.
+     * Saves the traffic events of a motorway in the cache.
      * Existing cache entries for the motorway are removed beforehand.
      *
      * @param roadId the motorway identifier
@@ -64,7 +65,7 @@ public class RoadEventCacheAdapter implements RoadEventCachePort {
     }
 
     /**
-     * Retrieves the cached traffic events for a motorway.
+     * Finds the cached traffic events for a motorway.
      *
      * @param roadId the motorway identifier
      * @return the result object containing the cached events and

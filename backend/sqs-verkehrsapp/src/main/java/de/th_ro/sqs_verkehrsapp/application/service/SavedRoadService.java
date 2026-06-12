@@ -3,10 +3,11 @@ package de.th_ro.sqs_verkehrsapp.application.service;
 import de.th_ro.sqs_verkehrsapp.application.port.in.SavedRoadUseCase;
 import de.th_ro.sqs_verkehrsapp.application.port.out.SavedRoadPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.SavedRoad;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Service implementation of {@link SavedRoadUseCase}.
@@ -60,7 +61,7 @@ public class SavedRoadService implements SavedRoadUseCase {
     }
 
     /**
-     * Removes a saved motorway for a specific user.
+     * Deletes a saved motorway for a specific user.
      *
      * @param userId the user identifier
      * @param roadId the motorway identifier

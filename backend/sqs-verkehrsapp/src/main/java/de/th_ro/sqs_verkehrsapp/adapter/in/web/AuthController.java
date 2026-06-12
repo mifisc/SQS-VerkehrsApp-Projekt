@@ -41,7 +41,7 @@ public class AuthController {
     }
 
     /**
-     * Authenticates an existing user and generates a JWT.
+     * Logs in an existing user and generates a JWT Token.
      *
      * @param request login credentials containing username and password
      * @return response containing the generated JWT

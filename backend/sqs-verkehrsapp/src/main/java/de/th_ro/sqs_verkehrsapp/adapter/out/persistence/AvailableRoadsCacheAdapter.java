@@ -3,8 +3,9 @@ package de.th_ro.sqs_verkehrsapp.adapter.out.persistence;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.AvailableRoadEntity;
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository.AvailableRoadRepository;
 import de.th_ro.sqs_verkehrsapp.application.port.out.AvailableRoadCachePort;
-import java.util.List;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Persistence adapter for the cache of available motorways.
@@ -27,7 +28,7 @@ public class AvailableRoadsCacheAdapter implements AvailableRoadCachePort {
     }
 
     /**
-     * Stores the provided motorway identifiers in the cache.
+     * Saves all provided motorway identifiers in the cache.
      * Existing entries are removed beforehand.
      *
      * @param roadIds the motorway identifiers to be cached

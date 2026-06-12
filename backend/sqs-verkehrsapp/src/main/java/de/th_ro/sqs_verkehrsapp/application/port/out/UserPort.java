@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.application.port.out;
 
 import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
+
 import java.util.Optional;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Optional;
 public interface UserPort {
 
     /**
-     * Persists a user.
+     * Saves a user.
      *
      * @param user the user to persist
      * @return the persisted user

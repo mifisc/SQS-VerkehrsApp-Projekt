@@ -2,6 +2,7 @@ package de.th_ro.sqs_verkehrsapp.application.port.out;
 
 import de.th_ro.sqs_verkehrsapp.domain.model.RoadEvent;
 import de.th_ro.sqs_verkehrsapp.domain.model.TrafficEventsResult;
+
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
 public interface RoadEventCachePort {
 
     /**
-     * Stores traffic events for a specific motorway in the cache.
+     * Saves traffic events for a specific motorway in the cache.
      *
      * @param roadId the motorway identifier
      * @param events the traffic events to cache
@@ -21,7 +22,7 @@ public interface RoadEventCachePort {
     void save(String roadId, List<RoadEvent> events);
 
     /**
-     * Retrieves cached traffic events for a specific motorway.
+     * Finds cached traffic events for a specific motorway.
      *
      * @param roadId the motorway identifier
      * @return the cached traffic events result

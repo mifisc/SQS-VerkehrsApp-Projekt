@@ -1,8 +1,9 @@
 package de.th_ro.sqs_verkehrsapp.adapter.out.persistence.repository;
 
 import de.th_ro.sqs_verkehrsapp.adapter.out.persistence.entity.CachedRoadEventEntity;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * Repository for accessing cached traffic events.
@@ -13,7 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CachedRoadEventRepository extends JpaRepository<CachedRoadEventEntity, Long> {
 
     /**
-     * Retrieves all cached traffic events for a specific motorway.
+     * Finds all cached traffic events for a specific motorway.
      *
      * @param roadId the motorway identifier
      * @return all associated traffic events
@@ -21,7 +22,7 @@ public interface CachedRoadEventRepository extends JpaRepository<CachedRoadEvent
     List<CachedRoadEventEntity> findByRoadId(String roadId);
 
     /**
-     * Removes all cached traffic events for a specific motorway.
+     * Deletes all cached traffic events for a specific motorway.
      *
      * @param roadId the motorway identifier
      */

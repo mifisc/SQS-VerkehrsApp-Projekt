@@ -12,7 +12,8 @@ import org.springframework.boot.SpringApplication;
 public class TestSqsVerkehrsappApplication {
 
 	/**
-	 * Starts the test application context with Testcontainers support.
+	 * Main method that starts the test application context
+	 * with Testcontainers support.
 	 *
 	 * @param args command-line arguments
 	 */

@@ -1,6 +1,7 @@
 package de.th_ro.sqs_verkehrsapp.application.port.in;
 
 import de.th_ro.sqs_verkehrsapp.domain.model.SavedRoad;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public interface SavedRoadUseCase {
     List<SavedRoad> getSavedRoads(UUID userId);
 
     /**
-     * Removes a saved motorway for a specific user.
+     * Deletes a saved motorway for a specific user.
      *
      * @param userId the user identifier
      * @param roadId the motorway identifier

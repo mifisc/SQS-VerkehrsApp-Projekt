@@ -19,7 +19,7 @@ public interface AuthUseCase {
     AppUser register(String username, String password);
 
     /**
-     * Authenticates an existing user.
+     * Login operation for an existing user.
      *
      * @param username the username
      * @param password the user's password

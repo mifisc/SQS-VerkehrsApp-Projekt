@@ -4,10 +4,11 @@ package de.th_ro.sqs_verkehrsapp.application.service;
 import de.th_ro.sqs_verkehrsapp.application.port.in.AuthUseCase;
 import de.th_ro.sqs_verkehrsapp.application.port.out.UserPort;
 import de.th_ro.sqs_verkehrsapp.domain.model.AppUser;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 /**
  * Service implementation of {@link AuthUseCase}.
@@ -50,7 +51,7 @@ public class AuthService implements AuthUseCase {
     }
 
     /**
-     * Authenticates a user using the provided credentials.
+     * Authenticates a user using the provided login credentials.
      *
      * @param username the username
      * @param password the user's password
